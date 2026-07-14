@@ -14,6 +14,7 @@ Two main areas:
 
 | Category | Technology |
 |---|---|
+| Runtime & Package Manager | Bun (dev + production runtime) |
 | Framework | Next.js 14+ (App Router, `output: 'standalone'`) |
 | Language | TypeScript (strict) |
 | Client State | Zustand (+ `persist` → localStorage) |
@@ -71,6 +72,7 @@ docker build -f Dockerfile .     # standalone image, target <150MB
 
 ## Deployment
 
+- **Bun runtime** in production (`oven/bun:alpine` base image, `bun server.js`)
 - `output: 'standalone'` — Docker image < 150MB
 - NGINX reverse proxy in front of the Next.js container
 - Co-located with controller-api + Postgres + Redis (Docker all-in-one, 4GB RAM VPS)
