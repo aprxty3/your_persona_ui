@@ -58,11 +58,11 @@ Clean Architecture — components NEVER `fetch` directly. Flow: component → ho
 ## Commands
 
 ```bash
-pnpm install          # install dependencies
-pnpm dev              # development server
-pnpm build            # production build
-pnpm lint             # linting
-pnpm test             # run tests
+bun install           # install dependencies
+bun dev               # development server
+bun run build         # production build
+bun run lint          # linting
+bun test              # run tests
 ```
 
 ```bash
