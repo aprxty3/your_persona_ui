@@ -98,6 +98,7 @@ Style: Naive Design/kidcore aesthetic, `rounded-2xl/3xl`, soft shadows, Framer M
 ## Documentation
 
 - **`TECHNICAL_DOCUMENTATION.md`** — API contracts, token management, error mapping, implementation details (primary reference)
+- **`controller-api/docs/swagger.json`** — machine-readable API contract (OpenAPI); the authoritative source for DTO shapes — breaking changes on the BE side go through `/v2`, never silent edits
 - **`AGENTS.md`** — Architecture & security rules for AI coding agents
 - **`CHECKLIST.md`** — Work order M0–M6 (milestones)
 - **`psyche-assessment-docs/PRD-psyche-assessment-mvp.md`** — Full product specification (sibling repo, local-only)
