@@ -1,0 +1,165 @@
+{
+  "common": {
+    "appName": "Your Persona's",
+    "tagline": "Meet the real you",
+    "cta": {
+      "startTest": "Start the free test",
+      "login": "Log in",
+      "register": "Sign up",
+      "back": "Back",
+      "continue": "Continue",
+      "submitting": "Sending..."
+    },
+    "errors": {
+      "generic": "Something went wrong. Please try again.",
+      "network": "Can't reach the server. Check your connection and try again.",
+      "rateLimited": "Too many requests from your network. Try again in {seconds} seconds.",
+      "serviceUnavailable": "We're having a hiccup on our side. Please try again in a moment."
+    },
+    "localeSwitcher": {
+      "label": "Language",
+      "en": "EN",
+      "id": "ID"
+    }
+  },
+  "landing": {
+    "meta": {
+      "title": "Your Persona's — Free MBTI & GRIT Personality Test",
+      "description": "Find your MBTI type, measure your GRIT, and get an AI-written personality summary — free, 15 minutes, no account needed."
+    },
+    "hero": {
+      "badge": "Free · ±15 minutes · No account needed",
+      "titleTop": "Which persona",
+      "titleHighlight": "are you?",
+      "subtitle": "Answer honest questions, meet your MBTI mascot, see your GRIT level, and get a personal AI-written summary about you — not a horoscope.",
+      "ctaPrimary": "Start the free test",
+      "ctaSecondary": "How it works",
+      "trust": "No credit card. No spam. Your essay stays private."
+    },
+    "chips": {
+      "mbti": "16 MBTI types",
+      "grit": "GRIT score + level",
+      "ai": "AI personal summary",
+      "pdf": "Shareable result + PDF"
+    },
+    "how": {
+      "title": "Three steps to the real you",
+      "subtitle": "No sign-up needed to start — your result is ready in one sitting.",
+      "steps": {
+        "one": {
+          "title": "Tell us a little about you",
+          "desc": "Just a name, your age, and what you're up to these days. 30 seconds, promise."
+        },
+        "two": {
+          "title": "Answer honestly",
+          "desc": "Scenario questions, quick scales, and one short guided reflection. No wrong answers — the honest one is the right one."
+        },
+        "three": {
+          "title": "Meet your persona",
+          "desc": "Your MBTI mascot, GRIT level, and an AI-written summary that actually reads like it knows you. Share it or save it as a PDF."
+        }
+      }
+    },
+    "features": {
+      "title": "What you'll get",
+      "items": {
+        "mbti": {
+          "title": "Your MBTI type + mascot",
+          "desc": "One of 16 types, each with its own collectible mascot character in two styles."
+        },
+        "grit": {
+          "title": "GRIT score with meaning",
+          "desc": "Not just a number — see whether your perseverance is Low, Medium, or High and what that means."
+        },
+        "summary": {
+          "title": "A summary about you",
+          "desc": "AI reads your reflection and writes 2–4 paragraphs about how you tick. Every result is unique."
+        },
+        "share": {
+          "title": "Made to be shared",
+          "desc": "A share-ready result card for your stories, plus a PDF report you can keep."
+        }
+      }
+    },
+    "finalCta": {
+      "title": "15 minutes from now, you'll know.",
+      "subtitle": "Free while in early access — take the test before your quota resets tomorrow-you's excuses.",
+      "button": "Find my persona"
+    },
+    "footer": {
+      "privacy": "Your essay answers are used only to generate your result and are never shared. Guest results auto-expire after 14 days.",
+      "rights": "© {year} Your Persona's. All rights reserved."
+    }
+  },
+  "onboarding": {
+    "meta": { "title": "Before we start — Your Persona's" },
+    "title": "First, a quick intro",
+    "subtitle": "This helps your result speak to you — not a generic template.",
+    "fields": {
+      "displayName": {
+        "label": "What should we call you?",
+        "placeholder": "Your name or nickname",
+        "help": "Shows up on your result card and PDF."
+      },
+      "age": {
+        "label": "Your age",
+        "placeholder": "e.g. 21",
+        "help": "The way questions are phrased adapts a little to life stage."
+      },
+      "status": {
+        "label": "What are you up to these days?",
+        "options": {
+          "student": "Studying",
+          "worker": "Working",
+          "freelancer": "Freelancing",
+          "unemployed": "In between things",
+          "other": "Something else"
+        }
+      },
+      "consent": {
+        "label": "I'm 13 or older, and I agree my answers are processed to generate my result.",
+        "privacy": "Privacy in one line: your essay is only used to build your result, guest data auto-deletes after 14 days, and nothing is ever sold."
+      }
+    },
+    "errors": {
+      "displayNameRequired": "We need something to call you.",
+      "ageMin": "You need to be at least 13 to take the test.",
+      "ageRequired": "Please fill in your age.",
+      "statusRequired": "Pick the one that fits best.",
+      "consentRequired": "We can't start without your consent."
+    },
+    "submit": "Let's go",
+    "rateLimited": "Too many new sessions from your network. Try again in {seconds} seconds."
+  },
+  "assessment": {
+    "comingSoon": {
+      "title": "The test engine lands here next (M3)",
+      "desc": "Onboarding worked — your guest session is ready. The question flow is the next milestone."
+    }
+  },
+  "auth": {
+    "login": {
+      "meta": { "title": "Log in — Your Persona's" },
+      "title": "Welcome back",
+      "subtitle": "Log in to see your dashboard, quota, and past results.",
+      "fields": {
+        "email": { "label": "Email", "placeholder": "you@example.com" },
+        "password": { "label": "Password", "placeholder": "Your password" }
+      },
+      "submit": "Log in",
+      "noAccount": "New here?",
+      "registerLink": "Create an account",
+      "forgotLink": "Forgot password?",
+      "errors": {
+        "emailInvalid": "That doesn't look like an email.",
+        "passwordRequired": "Password is required.",
+        "invalidCredentials": "Email or password is incorrect.",
+        "emailNotVerified": "Your email isn't verified yet. Check your inbox for the OTP code.",
+        "accountLocked": "Too many failed attempts — your account is locked for about 15 minutes.",
+        "turnstileFailed": "Bot check failed. Please complete the challenge again.",
+        "turnstileRequired": "Please complete the bot check first."
+      },
+      "success": "Logged in! Redirecting..."
+    }
+  }
+}

@@ -1,0 +1,165 @@
+{
+  "common": {
+    "appName": "Your Persona's",
+    "tagline": "Kenalan sama dirimu yang asli",
+    "cta": {
+      "startTest": "Mulai tes gratis",
+      "login": "Masuk",
+      "register": "Daftar",
+      "back": "Kembali",
+      "continue": "Lanjut",
+      "submitting": "Mengirim..."
+    },
+    "errors": {
+      "generic": "Ada yang salah. Coba lagi ya.",
+      "network": "Server nggak kejangkau. Cek koneksimu lalu coba lagi.",
+      "rateLimited": "Terlalu banyak percobaan dari jaringanmu. Coba lagi dalam {seconds} detik.",
+      "serviceUnavailable": "Lagi ada gangguan di sisi kami. Coba lagi sebentar lagi ya."
+    },
+    "localeSwitcher": {
+      "label": "Bahasa",
+      "en": "EN",
+      "id": "ID"
+    }
+  },
+  "landing": {
+    "meta": {
+      "title": "Your Persona's — Tes Kepribadian MBTI & GRIT Gratis",
+      "description": "Temukan tipe MBTI-mu, ukur GRIT-mu, dan dapatkan ringkasan kepribadian yang ditulis AI — gratis, 15 menit, tanpa perlu akun."
+    },
+    "hero": {
+      "badge": "Gratis · ±15 menit · Tanpa akun",
+      "titleTop": "Persona kamu",
+      "titleHighlight": "yang mana?",
+      "subtitle": "Jawab pertanyaan jujur, kenalan sama maskot MBTI-mu, lihat level GRIT-mu, dan dapatkan ringkasan personal yang ditulis AI tentang kamu — bukan ramalan bintang.",
+      "ctaPrimary": "Mulai tes gratis",
+      "ctaSecondary": "Cara kerjanya",
+      "trust": "Tanpa kartu kredit. Tanpa spam. Esaimu tetap privat."
+    },
+    "chips": {
+      "mbti": "16 tipe MBTI",
+      "grit": "Skor GRIT + level",
+      "ai": "Ringkasan personal AI",
+      "pdf": "Hasil siap share + PDF"
+    },
+    "how": {
+      "title": "Tiga langkah menuju kamu yang asli",
+      "subtitle": "Nggak perlu daftar buat mulai — hasilnya jadi dalam sekali duduk.",
+      "steps": {
+        "one": {
+          "title": "Cerita dikit tentang kamu",
+          "desc": "Cukup nama, usia, dan lagi sibuk apa sekarang. 30 detik, janji."
+        },
+        "two": {
+          "title": "Jawab dengan jujur",
+          "desc": "Pertanyaan skenario, skala cepat, dan satu refleksi singkat terpandu. Nggak ada jawaban salah — yang jujur itu yang benar."
+        },
+        "three": {
+          "title": "Kenalan sama personamu",
+          "desc": "Maskot MBTI-mu, level GRIT, dan ringkasan tulisan AI yang beneran kayak kenal kamu. Share atau simpan jadi PDF."
+        }
+      }
+    },
+    "features": {
+      "title": "Yang bakal kamu dapat",
+      "items": {
+        "mbti": {
+          "title": "Tipe MBTI + maskotmu",
+          "desc": "Satu dari 16 tipe, masing-masing punya karakter maskot koleksi dengan dua gaya."
+        },
+        "grit": {
+          "title": "Skor GRIT yang bermakna",
+          "desc": "Bukan cuma angka — lihat apakah kegigihanmu Rendah, Sedang, atau Tinggi dan artinya apa."
+        },
+        "summary": {
+          "title": "Ringkasan tentang kamu",
+          "desc": "AI membaca refleksimu dan menulis 2–4 paragraf tentang cara kamu bekerja. Tiap hasil itu unik."
+        },
+        "share": {
+          "title": "Dibuat untuk di-share",
+          "desc": "Kartu hasil siap-story buat medsosmu, plus laporan PDF yang bisa kamu simpan."
+        }
+      }
+    },
+    "finalCta": {
+      "title": "15 menit dari sekarang, kamu bakal tahu.",
+      "subtitle": "Gratis selama early access — ambil tesnya sebelum kamu-yang-besok cari alasan lagi.",
+      "button": "Temukan personaku"
+    },
+    "footer": {
+      "privacy": "Jawaban esaimu hanya dipakai untuk membuat hasilmu dan tidak pernah dibagikan. Hasil Guest otomatis kedaluwarsa setelah 14 hari.",
+      "rights": "© {year} Your Persona's. Hak cipta dilindungi."
+    }
+  },
+  "onboarding": {
+    "meta": { "title": "Sebelum mulai — Your Persona's" },
+    "title": "Kenalan dulu, bentar aja",
+    "subtitle": "Biar hasilmu terasa ngomong ke kamu — bukan template generik.",
+    "fields": {
+      "displayName": {
+        "label": "Kamu mau dipanggil apa?",
+        "placeholder": "Nama atau nama panggilan",
+        "help": "Muncul di kartu hasil dan PDF-mu."
+      },
+      "age": {
+        "label": "Usiamu",
+        "placeholder": "mis. 21",
+        "help": "Gaya pertanyaan menyesuaikan sedikit dengan fase hidupmu."
+      },
+      "status": {
+        "label": "Lagi sibuk apa sekarang?",
+        "options": {
+          "student": "Sekolah / kuliah",
+          "worker": "Kerja",
+          "freelancer": "Freelance",
+          "unemployed": "Lagi jeda dulu",
+          "other": "Lainnya"
+        }
+      },
+      "consent": {
+        "label": "Aku berusia 13+ dan setuju jawabanku diproses untuk membuat hasilku.",
+        "privacy": "Privasi satu baris: esaimu hanya dipakai membangun hasilmu, data guest otomatis terhapus setelah 14 hari, dan tidak pernah dijual."
+      }
+    },
+    "errors": {
+      "displayNameRequired": "Kami butuh nama panggilanmu.",
+      "ageMin": "Minimal 13 tahun untuk ikut tes ini.",
+      "ageRequired": "Isi usiamu dulu ya.",
+      "statusRequired": "Pilih yang paling pas.",
+      "consentRequired": "Kami nggak bisa mulai tanpa persetujuanmu."
+    },
+    "submit": "Gas!",
+    "rateLimited": "Terlalu banyak sesi baru dari jaringanmu. Coba lagi dalam {seconds} detik."
+  },
+  "assessment": {
+    "comingSoon": {
+      "title": "Mesin tes hadir di sini berikutnya (M3)",
+      "desc": "Onboarding berhasil — guest session-mu siap. Alur soal adalah milestone berikutnya."
+    }
+  },
+  "auth": {
+    "login": {
+      "meta": { "title": "Masuk — Your Persona's" },
+      "title": "Selamat datang balik",
+      "subtitle": "Masuk untuk lihat dashboard, kuota, dan hasil-hasil sebelumnya.",
+      "fields": {
+        "email": { "label": "Email", "placeholder": "kamu@contoh.com" },
+        "password": { "label": "Kata sandi", "placeholder": "Kata sandimu" }
+      },
+      "submit": "Masuk",
+      "noAccount": "Baru di sini?",
+      "registerLink": "Bikin akun",
+      "forgotLink": "Lupa kata sandi?",
+      "errors": {
+        "emailInvalid": "Sepertinya itu bukan email.",
+        "passwordRequired": "Kata sandi wajib diisi.",
+        "invalidCredentials": "Email atau kata sandi salah.",
+        "emailNotVerified": "Emailmu belum terverifikasi. Cek inbox untuk kode OTP.",
+        "accountLocked": "Terlalu banyak percobaan gagal — akunmu terkunci sekitar 15 menit.",
+        "turnstileFailed": "Verifikasi bot gagal. Selesaikan tantangannya sekali lagi ya.",
+        "turnstileRequired": "Selesaikan verifikasi bot dulu ya."
+      },
+      "success": "Berhasil masuk! Mengalihkan..."
+    }
+  }
+}

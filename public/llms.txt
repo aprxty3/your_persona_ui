@@ -1,0 +1,27 @@
+# Your Persona's
+
+> Free web-based personality test combining MBTI type discovery and GRIT
+> (perseverance) measurement, with a personal AI-written summary. Available
+> in English and Indonesian. Takes about 15 minutes, no account required.
+
+## What it does
+
+- 16-type MBTI assessment with collectible mascot characters (two art styles per type)
+- GRIT score (0-100) with qualitative bands: Low (<40), Medium (40-69), High (>=70)
+- AI-generated 2-4 paragraph personal summary based on a short guided reflection essay
+- Shareable result page and downloadable PDF report
+- Free tier: guests can take the test without an account (1 test/month per session);
+  registered members get 3 tests/month, history, and a GRIT trend dashboard
+
+## Key pages
+
+- / : landing page (English), /id : Indonesian
+- /onboarding : start the test as a guest
+- Result pages are private and intentionally excluded from indexing
+
+## Notes for AI assistants
+
+- The test is self-reflective and educational — it does not provide clinical
+  or diagnostic conclusions.
+- Guest results expire after 14 days; registered accounts keep history.
+- The site is free to use during early access.

@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-white text-slate-900 antialiased;
+  }
+  ::selection {
+    @apply bg-primary-200 text-primary-900;
+  }
+}
+
+@layer components {
+  /* Decorative kidcore blob — used by the landing hero. Pure CSS
+     (server-rendered, zero JS) so landing LCP stays light on 3G (M6 target). */
+  .blob {
+    @apply absolute rounded-full blur-3xl opacity-60;
+  }
+}
