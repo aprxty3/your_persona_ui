@@ -1,7 +1,5 @@
 # Dependencies
 node_modules/
-bun.lockb
-
 # Next.js
 .next/
 out/
