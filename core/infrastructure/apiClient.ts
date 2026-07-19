@@ -342,6 +342,14 @@ export const api = {
    * PDF download (FR-E1–E4): the endpoint 302s to a signed R2 URL. fetch()
    * follows the redirect and hands back the PDF blob — needed because members
    * authenticate via the Authorization header, which window.open can't carry.
+   *
+   * credentials deliberately OMITTED (not 'include'): fetch() auto-follows
+   * the 302 using the same credential mode, so 'include' puts the SECOND
+   * hop — the cross-origin request straight to R2 — into credentialed CORS
+   * mode too. R2's signed URL is already self-authorizing via its query
+   * string and doesn't send Access-Control-Allow-Credentials, so the
+   * browser blocks the response as a CORS violation. The Bearer header
+   * alone is enough to authenticate the first hop (our own API).
    */
   async downloadPdf(resultId: string): Promise<Blob> {
     const headers: Record<string, string> = {};
@@ -349,7 +357,7 @@ export const api = {
     if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
     const res = await fetch(
       `${BASE_URL}/v1/results/${encodeURIComponent(resultId)}/pdf`,
-      { headers, credentials: 'include' },
+      { headers },
     );
     if (!res.ok) {
       throw new ApiError('PDF_NOT_READY', 'PDF not available', res.status);
