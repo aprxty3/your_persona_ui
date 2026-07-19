@@ -31,7 +31,7 @@ export function QuotaExceededPanel() {
       </p>
       {!isAuthenticated && (
         <Link
-          href="/auth/login"
+          href="/auth/register"
           className="mt-5 inline-block rounded-2xl bg-accent px-6 py-3 font-bold text-white shadow-pop hover:bg-accent-700"
         >
           {t('ctaRegister')}

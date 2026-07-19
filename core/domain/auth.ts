@@ -64,3 +64,14 @@ export const VerifyResetOTPResponseSchema = z.object({
 export type VerifyResetOTPResponse = z.infer<
   typeof VerifyResetOTPResponseSchema
 >;
+
+// Register 201 — as-built: `userID` (Go field without a snake_case json tag).
+export const RegisterResponseSchema = z.object({
+  userID: z.string(),
+});
+export type RegisterResponse = z.infer<typeof RegisterResponseSchema>;
+
+export const ResendEmailOTPRequestSchema = z.object({
+  email: z.string().email(),
+});
+export type ResendEmailOTPRequest = z.infer<typeof ResendEmailOTPRequestSchema>;

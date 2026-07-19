@@ -5,35 +5,43 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import { useRouter } from '@/i18n/routing';
-import { useLogin } from '@/core/application/useAuth';
+import { useRegister } from '@/core/application/useAuth';
+import { consumeReferralCode } from '@/core/application/referral';
 import { ApiError } from '@/core/infrastructure/apiClient';
+import { LocaleSchema } from '@/core/domain/guestSession';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 
-// AUTH MENU IMPLEMENTATION EXAMPLE (login) — template for register/forgot in M5.
-// Patterns demonstrated here:
-// 1. Turnstile (§5.3): widget token → `cf_turnstile_response` field;
-//    TURNSTILE_VERIFICATION_FAILED → reset the widget, FORM INPUT IS KEPT.
-// 2. §9 error mapping: INVALID_CREDENTIALS / EMAIL_NOT_VERIFIED /
-//    ACCOUNT_LOCKED (423) / RATE_LIMITED per code, not one generic message.
-// 3. Token pair → authStore (access in-memory, refresh localStorage) via hook.
+// M5 — register (FR-H1). display_name/age/status are NOT asked here: with a
+// live guest session cookie the BE copies them from GUEST_SESSION (the claim
+// flow); without one, they're filled later via PATCH /account/profile.
+// referral_code comes silently from localStorage (?ref= capture at landing).
 
-export function LoginForm() {
-  const t = useTranslations('auth.login');
+export function RegisterForm() {
+  const t = useTranslations('auth.register');
   const tc = useTranslations('common');
+  const locale = useLocale();
   const router = useRouter();
-  const login = useLogin();
+  const searchParams = useSearchParams();
+  const registerMutation = useRegister();
 
   const turnstileRef = useRef<TurnstileInstance>(null);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [turnstileError, setTurnstileError] = useState<string | null>(null);
 
-  const FormSchema = z.object({
-    email: z.string().email(t('errors.emailInvalid')),
-    password: z.string().min(1, t('errors.passwordRequired')),
-  });
+  const FormSchema = z
+    .object({
+      email: z.string().email(t('errors.emailInvalid')),
+      password: z.string().min(10, t('errors.passwordMin')),
+      confirm: z.string(),
+    })
+    .refine((v) => v.password === v.confirm, {
+      path: ['confirm'],
+      message: t('errors.passwordMismatch'),
+    });
   type FormValues = z.infer<typeof FormSchema>;
 
   const {
@@ -49,22 +57,24 @@ export function LoginForm() {
     }
     setTurnstileError(null);
 
-    login.mutate(
-      { ...values, cf_turnstile_response: turnstileToken },
+    registerMutation.mutate(
       {
-        onSuccess: () => router.push('/dashboard'),
+        email: values.email,
+        password: values.password,
+        preferred_locale: LocaleSchema.parse(locale),
+        referral_code: consumeReferralCode(), // BE treats null/"" as "none"
+        cf_turnstile_response: turnstileToken,
+        fromClaim: searchParams.get('from') === 'claim',
+      },
+      {
+        onSuccess: () =>
+          router.push(`/auth/verify-email?email=${encodeURIComponent(values.email)}`),
         onError: (err) => {
-          if (err instanceof ApiError && err.code === 'EMAIL_NOT_VERIFIED') {
-            // Unverified account → straight to the OTP page for this email.
-            router.push(`/auth/verify-email?email=${encodeURIComponent(values.email)}`);
-            return;
-          }
           if (
             err instanceof ApiError &&
             err.code === 'TURNSTILE_VERIFICATION_FAILED'
           ) {
-            // §5.3 — the challenge is repeated, form input is NOT cleared.
-            turnstileRef.current?.reset();
+            turnstileRef.current?.reset(); // §5.3 — input is KEPT
             setTurnstileToken(null);
           }
         },
@@ -72,23 +82,21 @@ export function LoginForm() {
     );
   });
 
-  const err = login.error;
+  const err = registerMutation.error;
   const errorMessage = (() => {
     if (!err) return null;
     if (!(err instanceof ApiError)) return tc('errors.generic');
     switch (err.code) {
-      case 'INVALID_CREDENTIALS':
-        return t('errors.invalidCredentials');
-      case 'EMAIL_NOT_VERIFIED':
-        return t('errors.emailNotVerified'); // M5: redirect to the OTP page
-      case 'ACCOUNT_LOCKED':
-        return t('errors.accountLocked');
+      case 'EMAIL_ALREADY_REGISTERED':
+        return t('errors.emailTaken');
+      case 'PASSWORD_TOO_SHORT':
+        return t('errors.passwordMin');
+      case 'PASSWORD_BREACHED':
+        return t('errors.passwordBreached');
       case 'TURNSTILE_VERIFICATION_FAILED':
         return t('errors.turnstileFailed');
       case 'RATE_LIMITED':
         return tc('errors.rateLimited', { seconds: err.retryAfterSeconds ?? 60 });
-      case 'SERVICE_UNAVAILABLE':
-        return tc('errors.serviceUnavailable');
       case 'NETWORK_ERROR':
         return tc('errors.network');
       default:
@@ -110,10 +118,20 @@ export function LoginForm() {
       <Input
         label={t('fields.password.label')}
         placeholder={t('fields.password.placeholder')}
+        help={t('fields.password.help')}
         error={errors.password?.message}
         type="password"
-        autoComplete="current-password"
+        autoComplete="new-password"
         {...register('password')}
+      />
+
+      <Input
+        label={t('fields.confirm.label')}
+        placeholder={t('fields.confirm.placeholder')}
+        error={errors.confirm?.message}
+        type="password"
+        autoComplete="new-password"
+        {...register('confirm')}
       />
 
       <div className="space-y-1.5">
@@ -121,7 +139,7 @@ export function LoginForm() {
           ref={turnstileRef}
           siteKey={
             process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ??
-            '1x00000000000000000000AA' // Cloudflare test sitekey — always passes (dev)
+            '1x00000000000000000000AA'
           }
           onSuccess={setTurnstileToken}
           onExpire={() => setTurnstileToken(null)}
@@ -138,8 +156,14 @@ export function LoginForm() {
         </p>
       )}
 
-      <Button type="submit" size="lg" loading={login.isPending} className="w-full">
-        {login.isPending ? tc('cta.submitting') : t('submit')}
+      <Button
+        type="submit"
+        variant="accent"
+        size="lg"
+        loading={registerMutation.isPending}
+        className="w-full"
+      >
+        {registerMutation.isPending ? tc('cta.submitting') : t('submit')}
       </Button>
     </form>
   );

@@ -6,17 +6,37 @@ import {
   type CreateGuestSessionRequest,
 } from '@/core/domain/guestSession';
 import {
+  RegisterResponseSchema,
   TokenPairSchema,
+  VerifyResetOTPResponseSchema,
+  type ForgotPasswordRequest,
   type LoginRequest,
+  type RegisterRequest,
+  type ResetPasswordRequest,
   type TokenPair,
+  type VerifyEmailOTPRequest,
+  type VerifyResetOTPRequest,
 } from '@/core/domain/auth';
 import {
+  PdfStatusSchema,
   QuestionListSchema,
   ResultSchema,
   SubmitRequestSchema,
   SubmitResponseSchema,
   type SubmitRequest,
 } from '@/core/domain/assessment';
+import {
+  DashboardResponseSchema,
+  HistoryItemSchema,
+  PaginationMetaSchema,
+} from '@/core/domain/dashboard';
+import {
+  ProfileResponseSchema,
+  ReferralCodeResponseSchema,
+  ReferralStatsResponseSchema,
+  UpdateProfileRequestSchema,
+  type UpdateProfileRequest,
+} from '@/core/domain/account';
 import {
   clearSession,
   getAccessToken,
@@ -97,8 +117,19 @@ async function request<S extends z.ZodTypeAny>(
   schema: S,
   path: string,
   opts: RequestOptions = {},
-  isRetry = false,
 ): Promise<z.infer<S>> {
+  const { data } = await requestWithMeta(schema, path, opts);
+  return data;
+}
+
+// Same pipeline, but also surfaces envelope.meta — needed for paginated
+// endpoints (history) where pagination lives in meta, not data (§4.3 envelope).
+async function requestWithMeta<S extends z.ZodTypeAny>(
+  schema: S,
+  path: string,
+  opts: RequestOptions = {},
+  isRetry = false,
+): Promise<{ data: z.infer<S>; meta?: Record<string, unknown> }> {
   const method = opts.method ?? 'GET';
   const headers: Record<string, string> = { ...opts.headers };
 
@@ -162,13 +193,16 @@ async function request<S extends z.ZodTypeAny>(
         clearSession();
         throw new ApiError(code, message, res.status, meta, requestId);
       }
-      return request(schema, path, opts, true);
+      return requestWithMeta(schema, path, opts, true);
     }
 
     throw new ApiError(code, message, res.status, meta, requestId);
   }
 
-  return schema.parse(envelope.data) as z.infer<S>;
+  return {
+    data: schema.parse(envelope.data) as z.infer<S>,
+    meta: (envelope.meta ?? undefined) as Record<string, unknown> | undefined,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -218,13 +252,140 @@ export const api = {
     );
   },
 
-  // M5 — auth implementation example (login). Register/OTP/forgot to follow.
+  // M5 — auth.
   login(input: LoginRequest): Promise<TokenPair> {
     return request(TokenPairSchema, '/v1/auth/login', {
       method: 'POST',
       body: input,
       skipAuthRefresh: true,
     });
+  },
+
+  register(input: RegisterRequest) {
+    // Sent WITH credentials: a live guest session_id cookie triggers the
+    // Guest→Member claim on the BE (onboarding data copy + result reassign).
+    return request(RegisterResponseSchema, '/v1/auth/register', {
+      method: 'POST',
+      body: input,
+      skipAuthRefresh: true,
+    });
+  },
+
+  // Success = auto-login (BE returns the token pair — no separate /login step).
+  verifyEmailOtp(input: VerifyEmailOTPRequest): Promise<TokenPair> {
+    return request(TokenPairSchema, '/v1/auth/verify-email-otp', {
+      method: 'POST',
+      body: input,
+      skipAuthRefresh: true,
+    });
+  },
+
+  // Cooldown 60s/email + cap 5x/day — RATE_LIMITED carries retry_after_seconds.
+  resendEmailOtp(email: string) {
+    return request(z.record(z.string(), z.unknown()), '/v1/auth/resend-email-otp', {
+      method: 'POST',
+      body: { email },
+      skipAuthRefresh: true,
+    });
+  },
+
+  // Always returns a generic 200, registered or not (anti-enumeration, FR-H4).
+  forgotPassword(input: ForgotPasswordRequest) {
+    return request(z.record(z.string(), z.unknown()), '/v1/auth/forgot-password', {
+      method: 'POST',
+      body: input,
+      skipAuthRefresh: true,
+    });
+  },
+
+  verifyResetOtp(input: VerifyResetOTPRequest) {
+    return request(VerifyResetOTPResponseSchema, '/v1/auth/verify-reset-otp', {
+      method: 'POST',
+      body: input,
+      skipAuthRefresh: true,
+    });
+  },
+
+  // Success = auto-login; all old sessions are revoked via token_version.
+  resetPassword(input: ResetPasswordRequest): Promise<TokenPair> {
+    return request(TokenPairSchema, '/v1/auth/reset-password', {
+      method: 'POST',
+      body: input,
+      skipAuthRefresh: true,
+    });
+  },
+
+  // M5 — Member dashboard (Epic F).
+  getDashboard() {
+    return request(DashboardResponseSchema, '/v1/user-dashboard');
+  },
+
+  async getHistory(page: number, limit = 10) {
+    const { data, meta } = await requestWithMeta(
+      z.array(HistoryItemSchema),
+      `/v1/user-dashboard/history?page=${page}&limit=${limit}`,
+    );
+    return {
+      items: data,
+      pagination: PaginationMetaSchema.nullish().catch(null).parse(meta ?? null),
+    };
+  },
+
+  getPdfStatus(resultId: string) {
+    return request(
+      PdfStatusSchema,
+      `/v1/results/${encodeURIComponent(resultId)}/pdf-status`,
+    );
+  },
+
+  /**
+   * PDF download (FR-E1–E4): the endpoint 302s to a signed R2 URL. fetch()
+   * follows the redirect and hands back the PDF blob — needed because members
+   * authenticate via the Authorization header, which window.open can't carry.
+   */
+  async downloadPdf(resultId: string): Promise<Blob> {
+    const headers: Record<string, string> = {};
+    const accessToken = getAccessToken();
+    if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
+    const res = await fetch(
+      `${BASE_URL}/v1/results/${encodeURIComponent(resultId)}/pdf`,
+      { headers, credentials: 'include' },
+    );
+    if (!res.ok) {
+      throw new ApiError('PDF_NOT_READY', 'PDF not available', res.status);
+    }
+    return res.blob();
+  },
+
+  // M5 — Account & compliance (§5.5). CSRF is enforced by the BE on profile
+  // and delete-request(/cancel) — the header rides along automatically.
+  updateProfile(input: UpdateProfileRequest) {
+    return request(ProfileResponseSchema, '/v1/account/profile', {
+      method: 'PATCH',
+      body: UpdateProfileRequestSchema.parse(input),
+    });
+  },
+
+  getReferralCode() {
+    return request(ReferralCodeResponseSchema, '/v1/account/referral-code');
+  },
+
+  getReferralStats() {
+    return request(ReferralStatsResponseSchema, '/v1/account/referral-stats');
+  },
+
+  requestDeletion() {
+    return request(z.record(z.string(), z.unknown()), '/v1/account/delete-request', {
+      method: 'POST',
+    });
+  },
+
+  cancelDeletion() {
+    return request(
+      z.record(z.string(), z.unknown()),
+      '/v1/account/delete-request/cancel',
+      { method: 'POST' },
+    );
   },
 
   async logout(): Promise<void> {

@@ -222,6 +222,116 @@
         "turnstileRequired": "Selesaikan verifikasi bot dulu ya."
       },
       "success": "Berhasil masuk! Mengalihkan..."
+    },
+    "register": {
+      "meta": {
+        "title": "Daftar — Your Persona's"
+      },
+      "title": "Bikin akunmu",
+      "subtitle": "Gratis selamanya — 3 tes tiap bulan, hasil tersimpan permanen.",
+      "fields": {
+        "email": {
+          "label": "Email",
+          "placeholder": "kamu@contoh.com"
+        },
+        "password": {
+          "label": "Kata sandi",
+          "placeholder": "Minimal 10 karakter",
+          "help": "Minimal 10 karakter. Kami cek ke database kebocoran yang diketahui."
+        },
+        "confirm": {
+          "label": "Ulangi kata sandi",
+          "placeholder": "Kata sandi yang sama"
+        }
+      },
+      "submit": "Buat akun",
+      "haveAccount": "Sudah punya akun?",
+      "loginLink": "Masuk",
+      "errors": {
+        "emailInvalid": "Itu nggak kelihatan seperti email.",
+        "passwordMin": "Kata sandi minimal 10 karakter.",
+        "passwordMismatch": "Kata sandinya nggak sama.",
+        "passwordBreached": "Kata sandi ini muncul di kebocoran data — pilih yang lain ya.",
+        "emailTaken": "Email ini sudah terdaftar. Coba masuk aja.",
+        "turnstileFailed": "Cek anti-bot gagal. Ulangi tantangannya ya.",
+        "turnstileRequired": "Selesaikan cek anti-bot dulu ya."
+      }
+    },
+    "verify": {
+      "meta": {
+        "title": "Verifikasi email — Your Persona's"
+      },
+      "title": "Cek kotak masukmu",
+      "subtitle": "Kami kirim kode 6 digit ke emailmu.",
+      "sentTo": "Kode terkirim ke {email}",
+      "missingEmail": "Nggak ada email untuk diverifikasi. Mulai dari halaman daftar ya.",
+      "fields": {
+        "otp": {
+          "label": "Kode verifikasi"
+        }
+      },
+      "submit": "Verifikasi & lanjut",
+      "resend": "Kirim ulang kode",
+      "resendCooldown": "Kirim ulang tersedia dalam {seconds} detik",
+      "errors": {
+        "invalidOtp": "Kodenya nggak cocok.",
+        "invalidOtpWithAttempts": "Kodenya nggak cocok. Sisa {attempts} percobaan.",
+        "otpExpired": "Kode sudah kedaluwarsa — minta kode baru ya.",
+        "otpMaxAttempts": "Terlalu banyak percobaan salah. Minta kode baru ya."
+      }
+    },
+    "forgot": {
+      "meta": {
+        "title": "Atur ulang kata sandi — Your Persona's"
+      },
+      "title": "Atur ulang kata sandimu",
+      "subtitle": "Tiga langkah cepat: email, kode, kata sandi baru.",
+      "backToLogin": "Kembali ke halaman masuk",
+      "fields": {
+        "email": {
+          "label": "Email",
+          "placeholder": "kamu@contoh.com"
+        },
+        "otp": {
+          "label": "Kode reset"
+        },
+        "newPassword": {
+          "label": "Kata sandi baru",
+          "placeholder": "Minimal 10 karakter",
+          "help": "Minimal 10 karakter, dicek ke database kebocoran."
+        },
+        "confirm": {
+          "label": "Ulangi kata sandi baru",
+          "placeholder": "Kata sandi yang sama"
+        }
+      },
+      "steps": {
+        "email": {
+          "desc": "Masukkan emailmu — kalau terdaftar, kami kirim kode reset.",
+          "submit": "Kirim kode reset"
+        },
+        "otp": {
+          "desc": "Kalau {email} terdaftar, kode 6 digit sedang dikirim.",
+          "submit": "Verifikasi kode"
+        },
+        "password": {
+          "desc": "Atur kata sandi barumu. Semua perangkat lain akan keluar otomatis.",
+          "submit": "Reset & masuk"
+        }
+      },
+      "errors": {
+        "emailInvalid": "Itu nggak kelihatan seperti email.",
+        "turnstileRequired": "Selesaikan cek anti-bot dulu ya.",
+        "turnstileFailed": "Cek anti-bot gagal. Ulangi tantangannya ya.",
+        "invalidOtp": "Kodenya nggak cocok.",
+        "invalidOtpWithAttempts": "Kodenya nggak cocok. Sisa {attempts} percobaan.",
+        "otpExpired": "Kode sudah kedaluwarsa — ulangi dari awal untuk kode baru.",
+        "otpMaxAttempts": "Terlalu banyak percobaan salah. Ulangi dari awal untuk kode baru.",
+        "tokenExpired": "Sesi reset sudah kedaluwarsa — ulangi dari langkah email.",
+        "passwordMin": "Kata sandi minimal 10 karakter.",
+        "passwordMismatch": "Kata sandinya nggak sama.",
+        "passwordBreached": "Kata sandi ini muncul di kebocoran data — pilih yang lain ya."
+      }
     }
   },
   "results": {
@@ -293,6 +403,78 @@
       "title": "Jangan sampai versi dirimu ini hilang",
       "desc": "Hasil guest terhapus setelah 14 hari. Simpan selamanya dengan akun gratis — plus dapat 3 tes tiap bulan.",
       "cta": "Simpan hasilku"
+    }
+  },
+  "dashboard": {
+    "meta": {
+      "title": "Dashboard — Your Persona's"
+    },
+    "title": "Dashboard kamu",
+    "settingsLink": "Pengaturan",
+    "logout": "Keluar",
+    "quota": {
+      "title": "Tes bulan ini",
+      "remaining": "Sisa {remaining}/{limit}",
+      "ctaNewTest": "Ikut tes baru",
+      "exhausted": "Sudah terpakai semua — kuotamu di-reset awal bulan depan."
+    },
+    "trend": {
+      "title": "Perjalanan GRIT-mu",
+      "empty": "Ikuti tes pertamamu untuk memulai perjalanan GRIT.",
+      "ariaLabel": "Grafik garis skor GRIT-mu dari waktu ke waktu",
+      "latest": "Terbaru: {score} — {band}",
+      "band": {
+        "low": "Masih pemanasan",
+        "medium": "Pendaki konsisten",
+        "high": "Nggak terbendung"
+      }
+    },
+    "insights": {
+      "title": "Micro-insight"
+    },
+    "history": {
+      "title": "Riwayat tes",
+      "empty": "Belum ada tes — riwayatmu bakal muncul di sini.",
+      "downloadPdf": "PDF",
+      "pdfPreparing": "Menyiapkan...",
+      "pdfFailed": "PDF gagal",
+      "prev": "Sebelumnya",
+      "next": "Berikutnya",
+      "pageOf": "Halaman {page} dari {total}"
+    }
+  },
+  "settings": {
+    "meta": {
+      "title": "Pengaturan — Your Persona's"
+    },
+    "title": "Pengaturan",
+    "backToDashboard": "Dashboard",
+    "locale": {
+      "title": "Bahasa",
+      "desc": "Email dan insight-mu juga mengikuti preferensi ini."
+    },
+    "referral": {
+      "title": "Ajak teman",
+      "desc": "Bagikan kodemu — lihat berapa teman yang bergabung dan menyelesaikan tes. (Kami nggak pernah menampilkan siapa mereka.)",
+      "generate": "Ambil kode referral-ku",
+      "copyLink": "Salin link",
+      "copied": "Tersalin!",
+      "signups": "{count} mendaftar",
+      "completed": "{count} menyelesaikan tes"
+    },
+    "deletion": {
+      "title": "Hapus akun",
+      "desc": "Datamu dianonimkan setelah masa tenggang 14 hari. Kamu bisa batalkan kapan saja dalam 14 hari itu.",
+      "requestButton": "Ajukan penghapusan akun",
+      "confirmNotice": "Yakin? Setelah 14 hari, nama, email, dan esaimu dianonimkan permanen. Nggak bisa dibatalkan setelah masa tenggang lewat.",
+      "confirmButton": "Ya, hapus akunku",
+      "pendingNotice": "Penghapusan diajukan — akunmu dianonimkan setelah masa tenggang 14 hari. Masih bisa dibatalkan di bawah.",
+      "cancelRequest": "Batalkan permintaan penghapusan",
+      "errors": {
+        "alreadyRequested": "Sudah ada permintaan penghapusan yang aktif.",
+        "noActive": "Nggak ada permintaan penghapusan aktif untuk dibatalkan.",
+        "processing": "Masa tenggang sudah lewat — penghapusan sedang diproses dan nggak bisa dibatalkan."
+      }
     }
   }
 }

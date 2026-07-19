@@ -45,10 +45,13 @@ export default async function LoginPage({
 
         <p className="mt-5 text-center text-sm text-slate-500">
           {t('noAccount')}{' '}
-          {/* M5: register page — links stubbed so the IA is visible */}
-          <span className="font-bold text-primary-700">{t('registerLink')}</span>
+          <Link href="/auth/register" className="font-bold text-primary-700">
+            {t('registerLink')}
+          </Link>
           {' · '}
-          <span className="font-bold text-primary-700">{t('forgotLink')}</span>
+          <Link href="/auth/forgot-password" className="font-bold text-primary-700">
+            {t('forgotLink')}
+          </Link>
         </p>
       </div>
 

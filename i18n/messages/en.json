@@ -222,6 +222,116 @@
         "turnstileRequired": "Please complete the bot check first."
       },
       "success": "Logged in! Redirecting..."
+    },
+    "register": {
+      "meta": {
+        "title": "Sign up — Your Persona's"
+      },
+      "title": "Create your account",
+      "subtitle": "Free forever — 3 tests every month, results saved permanently.",
+      "fields": {
+        "email": {
+          "label": "Email",
+          "placeholder": "you@example.com"
+        },
+        "password": {
+          "label": "Password",
+          "placeholder": "At least 10 characters",
+          "help": "Minimum 10 characters. We check it against known breach databases."
+        },
+        "confirm": {
+          "label": "Repeat password",
+          "placeholder": "Same password again"
+        }
+      },
+      "submit": "Create account",
+      "haveAccount": "Already have an account?",
+      "loginLink": "Log in",
+      "errors": {
+        "emailInvalid": "That doesn't look like an email.",
+        "passwordMin": "Password needs at least 10 characters.",
+        "passwordMismatch": "The passwords don't match.",
+        "passwordBreached": "This password appears in a known data breach — pick a different one.",
+        "emailTaken": "This email is already registered. Try logging in instead.",
+        "turnstileFailed": "Bot check failed. Please complete the challenge again.",
+        "turnstileRequired": "Please complete the bot check first."
+      }
+    },
+    "verify": {
+      "meta": {
+        "title": "Verify email — Your Persona's"
+      },
+      "title": "Check your inbox",
+      "subtitle": "We sent a 6-digit code to your email.",
+      "sentTo": "Code sent to {email}",
+      "missingEmail": "No email to verify. Start from the register page.",
+      "fields": {
+        "otp": {
+          "label": "Verification code"
+        }
+      },
+      "submit": "Verify & continue",
+      "resend": "Resend code",
+      "resendCooldown": "Resend available in {seconds}s",
+      "errors": {
+        "invalidOtp": "That code isn't right.",
+        "invalidOtpWithAttempts": "That code isn't right. {attempts} attempts left.",
+        "otpExpired": "This code has expired — request a new one.",
+        "otpMaxAttempts": "Too many wrong attempts. Request a new code."
+      }
+    },
+    "forgot": {
+      "meta": {
+        "title": "Reset password — Your Persona's"
+      },
+      "title": "Reset your password",
+      "subtitle": "Three quick steps: email, code, new password.",
+      "backToLogin": "Back to log in",
+      "fields": {
+        "email": {
+          "label": "Email",
+          "placeholder": "you@example.com"
+        },
+        "otp": {
+          "label": "Reset code"
+        },
+        "newPassword": {
+          "label": "New password",
+          "placeholder": "At least 10 characters",
+          "help": "Minimum 10 characters, checked against breach databases."
+        },
+        "confirm": {
+          "label": "Repeat new password",
+          "placeholder": "Same password again"
+        }
+      },
+      "steps": {
+        "email": {
+          "desc": "Enter your email — if it's registered, we'll send a reset code.",
+          "submit": "Send reset code"
+        },
+        "otp": {
+          "desc": "If {email} is registered, a 6-digit code is on its way.",
+          "submit": "Verify code"
+        },
+        "password": {
+          "desc": "Set your new password. All other devices will be logged out.",
+          "submit": "Reset & log in"
+        }
+      },
+      "errors": {
+        "emailInvalid": "That doesn't look like an email.",
+        "turnstileRequired": "Please complete the bot check first.",
+        "turnstileFailed": "Bot check failed. Please complete the challenge again.",
+        "invalidOtp": "That code isn't right.",
+        "invalidOtpWithAttempts": "That code isn't right. {attempts} attempts left.",
+        "otpExpired": "This code has expired — start over to get a new one.",
+        "otpMaxAttempts": "Too many wrong attempts. Start over to get a new code.",
+        "tokenExpired": "This reset session has expired — start over from your email.",
+        "passwordMin": "Password needs at least 10 characters.",
+        "passwordMismatch": "The passwords don't match.",
+        "passwordBreached": "This password appears in a known data breach — pick a different one."
+      }
     }
   },
   "results": {
@@ -293,6 +403,78 @@
       "title": "Don't lose this version of you",
       "desc": "Guest results disappear after 14 days. Save it forever with a free account — and get 3 tests every month.",
       "cta": "Save my result"
+    }
+  },
+  "dashboard": {
+    "meta": {
+      "title": "Dashboard — Your Persona's"
+    },
+    "title": "Your dashboard",
+    "settingsLink": "Settings",
+    "logout": "Log out",
+    "quota": {
+      "title": "Tests this month",
+      "remaining": "{remaining}/{limit} left",
+      "ctaNewTest": "Take a new test",
+      "exhausted": "All used up — your quota resets at the start of next month."
+    },
+    "trend": {
+      "title": "Your GRIT journey",
+      "empty": "Take your first test to start your GRIT journey.",
+      "ariaLabel": "Line chart of your GRIT scores over time",
+      "latest": "Latest: {score} — {band}",
+      "band": {
+        "low": "Still warming up",
+        "medium": "Steady climber",
+        "high": "Unstoppable"
+      }
+    },
+    "insights": {
+      "title": "Micro-insights"
+    },
+    "history": {
+      "title": "Test history",
+      "empty": "No tests yet — your history will appear here.",
+      "downloadPdf": "PDF",
+      "pdfPreparing": "Preparing...",
+      "pdfFailed": "PDF failed",
+      "prev": "Previous",
+      "next": "Next",
+      "pageOf": "Page {page} of {total}"
+    }
+  },
+  "settings": {
+    "meta": {
+      "title": "Settings — Your Persona's"
+    },
+    "title": "Settings",
+    "backToDashboard": "Dashboard",
+    "locale": {
+      "title": "Language",
+      "desc": "Your emails and insights follow this preference too."
+    },
+    "referral": {
+      "title": "Invite friends",
+      "desc": "Share your code — see how many friends joined and finished a test. (We never show you who they are.)",
+      "generate": "Get my referral code",
+      "copyLink": "Copy link",
+      "copied": "Copied!",
+      "signups": "{count} signed up",
+      "completed": "{count} completed a test"
+    },
+    "deletion": {
+      "title": "Delete account",
+      "desc": "Your data gets anonymized after a 14-day grace period. You can cancel any time within those 14 days.",
+      "requestButton": "Request account deletion",
+      "confirmNotice": "Are you sure? After 14 days your name, email, and essays are permanently anonymized. This cannot be undone after the grace period.",
+      "confirmButton": "Yes, delete my account",
+      "pendingNotice": "Deletion requested — your account will be anonymized after the 14-day grace period. You can still cancel below.",
+      "cancelRequest": "Cancel deletion request",
+      "errors": {
+        "alreadyRequested": "A deletion request is already active.",
+        "noActive": "There's no active deletion request to cancel.",
+        "processing": "The grace period has passed — deletion is already processing and can't be cancelled."
+      }
     }
   }
 }

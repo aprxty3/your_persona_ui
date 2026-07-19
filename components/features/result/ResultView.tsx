@@ -173,8 +173,9 @@ function ClaimBanner() {
     <Card tint="accent">
       <h2 className="font-extrabold text-slate-800">{t('claim.title')}</h2>
       <p className="mt-1.5 text-sm text-slate-600">{t('claim.desc')}</p>
+      {/* from=claim → register_from_claim funnel event on successful register */}
       <Link
-        href="/auth/login"
+        href="/auth/register?from=claim"
         className="mt-4 inline-block rounded-2xl bg-accent px-5 py-2.5 text-sm font-bold text-white shadow-pop hover:bg-accent-700"
       >
         {t('claim.cta')}
