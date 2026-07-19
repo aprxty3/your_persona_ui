@@ -104,7 +104,10 @@ export function AssessmentForm() {
           return value ? [{ question_id: q.id, value }] : [];
         }),
       },
-      { onSuccess: (res) => router.push(`/results/${res.ResultID}`) },
+      // replace, not push: the assessment can't be resubmitted, so it must
+      // not sit in the back-stack behind the result (browser Back would
+      // otherwise land on a dead, already-answered form).
+      { onSuccess: (res) => router.replace(`/results/${res.ResultID}`) },
     );
   };
 

@@ -6,6 +6,8 @@ import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { useResult, useSetMascotStyle } from '@/core/application/useResult';
+import { useDownloadPdf } from '@/core/application/useAccount';
+import { usePdfStatus } from '@/core/application/usePdfStatus';
 import { useAuthStore } from '@/core/application/stores/authStore';
 import { track } from '@/core/infrastructure/analytics';
 import { ApiError } from '@/core/infrastructure/apiClient';
@@ -65,10 +67,34 @@ export function ResultView({ resultId }: { resultId: string }) {
     );
   }
 
-  return data.is_owner ? <FullResult result={data} /> : <TeaserResult result={data} />;
+  return (
+    <>
+      <BackNav />
+      {data.is_owner ? <FullResult result={data} /> : <TeaserResult result={data} />}
+    </>
+  );
 }
 
 // ---------------------------------------------------------------------------
+
+// FR-D-adjacent UX fix: landing here always follows a router.replace from the
+// assessment/claim flow (history entry doesn't stack), so the browser Back
+// button has nowhere sensible to go — this is the only way back in.
+function BackNav() {
+  const t = useTranslations('results');
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+
+  return (
+    <div className="pt-4">
+      <Link
+        href={isAuthenticated ? '/dashboard' : '/'}
+        className="inline-flex items-center gap-1 text-sm font-bold text-primary-600 hover:underline"
+      >
+        ← {isAuthenticated ? t('nav.backDashboard') : t('nav.backHome')}
+      </Link>
+    </div>
+  );
+}
 
 function MascotImage({ result, size }: { result: Result; size: number }) {
   const t = useTranslations('results');
@@ -285,8 +311,46 @@ function FullResult({ result }: { result: Result }) {
 
       <ShareButton resultId={result.result_id} />
 
+      {isAuthenticated && <PdfDownloadButton resultId={result.result_id} />}
+
       {!isAuthenticated && <ClaimBanner />}
     </div>
+  );
+}
+
+// PDF is a member-only perk (FR-E1) — guests get the Claim Banner instead,
+// which is the actual path to unlocking a PDF at all.
+function PdfDownloadButton({ resultId }: { resultId: string }) {
+  const t = useTranslations('results');
+  const download = useDownloadPdf();
+  const [pollingWanted, setPollingWanted] = useState(false);
+  const pdfStatus = usePdfStatus(resultId, pollingWanted);
+
+  const status = pdfStatus.data?.pdf_status;
+  const ready = !pollingWanted || status === 'completed';
+
+  const onDownload = () => {
+    track('pdf_download_clicked');
+    download.mutate(resultId, {
+      onError: () => setPollingWanted(true), // not ready → start backoff polling
+    });
+  };
+
+  if (pollingWanted && status === 'failed') {
+    return <p className="text-center text-sm font-bold text-red-600">{t('pdf.failed')}</p>;
+  }
+
+  return (
+    <Button
+      variant="outline"
+      size="lg"
+      onClick={onDownload}
+      loading={download.isPending || (pollingWanted && !ready)}
+      disabled={pollingWanted && !ready}
+      className="w-full"
+    >
+      {pollingWanted && !ready ? t('pdf.preparing') : t('pdf.download')}
+    </Button>
   );
 }
 

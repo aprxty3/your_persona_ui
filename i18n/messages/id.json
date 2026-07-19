@@ -353,6 +353,15 @@
       "youAre": "Kamu adalah",
       "sharedIs": "Persona ini adalah"
     },
+    "nav": {
+      "backDashboard": "Kembali ke dashboard",
+      "backHome": "Kembali ke beranda"
+    },
+    "pdf": {
+      "download": "Unduh PDF",
+      "preparing": "Menyiapkan...",
+      "failed": "PDF gagal — coba lagi"
+    },
     "grit": {
       "title": "Kegigihan (GRIT)",
       "band": {

@@ -65,9 +65,10 @@ export type VerifyResetOTPResponse = z.infer<
   typeof VerifyResetOTPResponseSchema
 >;
 
-// Register 201 — as-built: `userID` (Go field without a snake_case json tag).
+// Register 201 — as-built: `UserID` (Go field without a snake_case json tag,
+// so Go's default marshaling emits the exported field name verbatim).
 export const RegisterResponseSchema = z.object({
-  userID: z.string(),
+  UserID: z.string(),
 });
 export type RegisterResponse = z.infer<typeof RegisterResponseSchema>;
 

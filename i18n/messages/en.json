@@ -353,6 +353,15 @@
       "youAre": "You are",
       "sharedIs": "This persona is"
     },
+    "nav": {
+      "backDashboard": "Back to dashboard",
+      "backHome": "Back to home"
+    },
+    "pdf": {
+      "download": "Download PDF",
+      "preparing": "Preparing...",
+      "failed": "PDF failed — try again"
+    },
     "grit": {
       "title": "Persistence (GRIT)",
       "band": {
