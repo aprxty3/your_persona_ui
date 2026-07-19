@@ -8,7 +8,8 @@
       "register": "Daftar",
       "back": "Kembali",
       "continue": "Lanjut",
-      "submitting": "Mengirim..."
+      "submitting": "Mengirim...",
+      "retry": "Coba lagi"
     },
     "errors": {
       "generic": "Ada yang salah. Coba lagi ya.",
@@ -20,7 +21,8 @@
       "label": "Bahasa",
       "en": "EN",
       "id": "ID"
-    }
+    },
+    "loading": "Memuat..."
   },
   "landing": {
     "meta": {
@@ -92,7 +94,9 @@
     }
   },
   "onboarding": {
-    "meta": { "title": "Sebelum mulai — Your Persona's" },
+    "meta": {
+      "title": "Sebelum mulai — Your Persona's"
+    },
     "title": "Kenalan dulu, bentar aja",
     "subtitle": "Biar hasilmu terasa ngomong ke kamu — bukan template generik.",
     "fields": {
@@ -132,19 +136,77 @@
     "rateLimited": "Terlalu banyak sesi baru dari jaringanmu. Coba lagi dalam {seconds} detik."
   },
   "assessment": {
-    "comingSoon": {
-      "title": "Mesin tes hadir di sini berikutnya (M3)",
-      "desc": "Onboarding berhasil — guest session-mu siap. Alur soal adalah milestone berikutnya."
+    "meta": {
+      "title": "Tes Kepribadian"
+    },
+    "progress": {
+      "section": "Bagian {section}",
+      "count": "{answered}/{total} terjawab"
+    },
+    "sections": {
+      "a": {
+        "title": "Bagian A — Kamu bakal ngapain?",
+        "intro": "Skenario sehari-hari. Pilih opsi yang paling mendekati apa yang beneran kamu lakuin — nggak ada jawaban salah."
+      },
+      "b": {
+        "title": "Bagian B — Seberapa 'kamu banget'?",
+        "intro": "Nilai seberapa cocok tiap pernyataan sama dirimu, dari sangat tidak setuju sampai sangat setuju. Ikutin insting aja."
+      },
+      "c": {
+        "title": "Bagian C — Ceritain pengalamanmu",
+        "intro": "Dua pertanyaan terpandu singkat. Beberapa kalimat jujur udah cukup — bagian ini yang bikin hasilmu terasa personal."
+      }
+    },
+    "essay": {
+      "guardrail": "Nggak perlu curhat detail — cerita singkat soal kejadiannya, apa yang kamu lakuin, dan hasilnya gimana udah pas banget.",
+      "placeholder": "Tulis beberapa kalimat dari pengalamanmu sendiri...",
+      "counterStart": "{words} kata — lanjutin, udah bagus kok",
+      "counterOk": "{words} kata — mantap, segini cukup (lebih juga boleh!)"
+    },
+    "waiting": {
+      "title": "Lagi baca ceritamu...",
+      "lines": {
+        "0": "Mencocokkan jawabanmu dengan 16 pola kepribadian...",
+        "1": "Esaimu lagi dibaca pelan-pelan...",
+        "2": "Mengukur skor kegigihanmu...",
+        "3": "Dikit lagi — lagi merapikan hasilmu..."
+      },
+      "note": "Biasanya cuma beberapa detik. Jangan tutup halaman ini ya."
+    },
+    "quota": {
+      "title": "Jatah tes bulan ini udah kepakai",
+      "descGuest": "Guest dapat 1 tes gratis per bulan. Bikin akun gratis dan dapatkan 3 tes tiap bulan — plus hasilmu tersimpan selamanya.",
+      "descMember": "3 tes bulan ini udah terpakai semua. Kuotamu di-reset awal bulan depan.",
+      "ctaRegister": "Daftar gratis — dapat 3 tes/bulan"
+    },
+    "errors": {
+      "incomplete": "Masih ada soal yang belum dijawab — scroll ke atas buat melengkapinya.",
+      "essayTooShort": "Isi tiap cerita minimal {min} karakter biar kami bisa benar-benar membacamu.",
+      "rateLimited": "Terlalu banyak kiriman dari jaringanmu. Coba lagi dalam {seconds} detik.",
+      "noSession": "Sesimu nggak ketemu. Mulai dari awal dulu ya biar kami siapin.",
+      "noSessionCta": "Ke onboarding"
+    },
+    "nav": {
+      "next": "Bagian berikutnya",
+      "submit": "Lihat hasilku"
     }
   },
   "auth": {
     "login": {
-      "meta": { "title": "Masuk — Your Persona's" },
+      "meta": {
+        "title": "Masuk — Your Persona's"
+      },
       "title": "Selamat datang balik",
       "subtitle": "Masuk untuk lihat dashboard, kuota, dan hasil-hasil sebelumnya.",
       "fields": {
-        "email": { "label": "Email", "placeholder": "kamu@contoh.com" },
-        "password": { "label": "Kata sandi", "placeholder": "Kata sandimu" }
+        "email": {
+          "label": "Email",
+          "placeholder": "kamu@contoh.com"
+        },
+        "password": {
+          "label": "Kata sandi",
+          "placeholder": "Kata sandimu"
+        }
       },
       "submit": "Masuk",
       "noAccount": "Baru di sini?",
@@ -160,6 +222,77 @@
         "turnstileRequired": "Selesaikan verifikasi bot dulu ya."
       },
       "success": "Berhasil masuk! Mengalihkan..."
+    }
+  },
+  "results": {
+    "meta": {
+      "title": "Hasil Persona Kamu"
+    },
+    "expired": {
+      "title": "Hasil ini sudah kedaluwarsa",
+      "desc": "Hasil guest disimpan 14 hari. Yang ini sudah hilang — tapi tes baru cuma butuh beberapa menit kok.",
+      "cta": "Ikut tes baru"
+    },
+    "teaser": {
+      "badge": "Hasil yang dibagikan",
+      "title": "Seseorang baru menemukan personanya!",
+      "desc": "Penasaran punyamu kayak apa? Tesnya gratis dan cuma butuh beberapa menit.",
+      "cta": "Cari tahu personaku"
+    },
+    "hero": {
+      "youAre": "Kamu adalah",
+      "sharedIs": "Persona ini adalah"
+    },
+    "grit": {
+      "title": "Kegigihan (GRIT)",
+      "band": {
+        "low": "Masih pemanasan",
+        "medium": "Pendaki konsisten",
+        "high": "Nggak terbendung"
+      }
+    },
+    "traits": {
+      "title": "Keseimbangan sifatmu",
+      "EI": {
+        "first": "Ekstrover",
+        "second": "Introver"
+      },
+      "SN": {
+        "first": "Praktis",
+        "second": "Imajinatif"
+      },
+      "TF": {
+        "first": "Logis",
+        "second": "Empatik"
+      },
+      "JP": {
+        "first": "Terstruktur",
+        "second": "Spontan"
+      }
+    },
+    "summary": {
+      "title": "Apa kata ceritamu tentang dirimu"
+    },
+    "wellbeing": {
+      "title": "Kami merasakan ceritamu membawa beban",
+      "desc": "Apa pun yang sedang kamu jalani, kamu nggak harus menanggungnya sendirian. Ngobrol dengan seseorang benar-benar bisa membantu.",
+      "resourceLabel": "Into The Light Indonesia — layanan dukungan",
+      "resourceUrl": "https://www.intothelightid.org/tentang-bunuh-diri/hotline-dan-konseling/"
+    },
+    "mascot": {
+      "styleLabel": "Gaya maskot",
+      "styleA": "Gaya A",
+      "styleB": "Gaya B",
+      "alt": "Maskot {mbti}"
+    },
+    "share": {
+      "button": "Bagikan personaku",
+      "copied": "Link tersalin!"
+    },
+    "claim": {
+      "title": "Jangan sampai versi dirimu ini hilang",
+      "desc": "Hasil guest terhapus setelah 14 hari. Simpan selamanya dengan akun gratis — plus dapat 3 tes tiap bulan.",
+      "cta": "Simpan hasilku"
     }
   }
 }

@@ -18,6 +18,26 @@ export type Question = z.infer<typeof QuestionSchema>;
 
 export const QuestionListSchema = z.array(QuestionSchema);
 
+/**
+ * `options` arrives as a JSON-encoded string array (BE contract). Defensive:
+ * malformed/absent options → [] so the renderer can show a graceful fallback
+ * instead of crashing mid-assessment.
+ */
+export function parseOptions(q: Question): string[] {
+  if (!q.options) return [];
+  try {
+    const parsed = JSON.parse(q.options);
+    return Array.isArray(parsed) ? parsed.filter((o) => typeof o === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
+/** SJT answers are option LETTERS (A..E) — index → letter, per BE scoring. */
+export function optionLetter(index: number): string {
+  return String.fromCharCode(65 + index);
+}
+
 // ---------- POST /v1/assessment/submit ----------
 
 export const AnswerInputSchema = z.object({

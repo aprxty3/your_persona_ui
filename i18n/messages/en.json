@@ -8,7 +8,8 @@
       "register": "Sign up",
       "back": "Back",
       "continue": "Continue",
-      "submitting": "Sending..."
+      "submitting": "Sending...",
+      "retry": "Try again"
     },
     "errors": {
       "generic": "Something went wrong. Please try again.",
@@ -20,7 +21,8 @@
       "label": "Language",
       "en": "EN",
       "id": "ID"
-    }
+    },
+    "loading": "Loading..."
   },
   "landing": {
     "meta": {
@@ -92,7 +94,9 @@
     }
   },
   "onboarding": {
-    "meta": { "title": "Before we start — Your Persona's" },
+    "meta": {
+      "title": "Before we start — Your Persona's"
+    },
     "title": "First, a quick intro",
     "subtitle": "This helps your result speak to you — not a generic template.",
     "fields": {
@@ -132,19 +136,77 @@
     "rateLimited": "Too many new sessions from your network. Try again in {seconds} seconds."
   },
   "assessment": {
-    "comingSoon": {
-      "title": "The test engine lands here next (M3)",
-      "desc": "Onboarding worked — your guest session is ready. The question flow is the next milestone."
+    "meta": {
+      "title": "Personality Test"
+    },
+    "progress": {
+      "section": "Section {section}",
+      "count": "{answered}/{total} answered"
+    },
+    "sections": {
+      "a": {
+        "title": "Section A — What would you do?",
+        "intro": "Everyday scenarios. Pick the option closest to what you'd actually do — there are no wrong answers."
+      },
+      "b": {
+        "title": "Section B — How much is this you?",
+        "intro": "Rate how much each statement fits you, from strongly disagree to strongly agree. Go with your gut."
+      },
+      "c": {
+        "title": "Section C — Tell your story",
+        "intro": "Two short guided prompts. A few honest sentences are enough — this is what makes your result feel personal."
+      }
+    },
+    "essay": {
+      "guardrail": "No need to overshare — a short story about what happened, what you did, and how it turned out is perfect.",
+      "placeholder": "Write a few sentences from your own experience...",
+      "counterStart": "{words} words — keep going, you're doing great",
+      "counterOk": "{words} words — nice, that's enough (more is welcome!)"
+    },
+    "waiting": {
+      "title": "Reading your story...",
+      "lines": {
+        "0": "Matching your answers against 16 personality patterns...",
+        "1": "Your essays are getting a close read...",
+        "2": "Measuring your persistence score...",
+        "3": "Almost there — polishing your result..."
+      },
+      "note": "This usually takes a few seconds. Don't close this page."
+    },
+    "quota": {
+      "title": "You've used this month's test",
+      "descGuest": "Guests get 1 free test per month. Create a free account and get 3 tests every month — plus your results are saved forever.",
+      "descMember": "You've used all 3 tests for this month. Your quota resets at the start of next month.",
+      "ctaRegister": "Sign up free — get 3 tests/month"
+    },
+    "errors": {
+      "incomplete": "A few questions are still unanswered — scroll up to finish them.",
+      "essayTooShort": "Give each story at least {min} characters so we can read you properly.",
+      "rateLimited": "Too many submissions from your network. Try again in {seconds} seconds.",
+      "noSession": "Your session wasn't found. Start from the beginning so we can set you up.",
+      "noSessionCta": "Go to onboarding"
+    },
+    "nav": {
+      "next": "Next section",
+      "submit": "See my results"
     }
   },
   "auth": {
     "login": {
-      "meta": { "title": "Log in — Your Persona's" },
+      "meta": {
+        "title": "Log in — Your Persona's"
+      },
       "title": "Welcome back",
       "subtitle": "Log in to see your dashboard, quota, and past results.",
       "fields": {
-        "email": { "label": "Email", "placeholder": "you@example.com" },
-        "password": { "label": "Password", "placeholder": "Your password" }
+        "email": {
+          "label": "Email",
+          "placeholder": "you@example.com"
+        },
+        "password": {
+          "label": "Password",
+          "placeholder": "Your password"
+        }
       },
       "submit": "Log in",
       "noAccount": "New here?",
@@ -160,6 +222,77 @@
         "turnstileRequired": "Please complete the bot check first."
       },
       "success": "Logged in! Redirecting..."
+    }
+  },
+  "results": {
+    "meta": {
+      "title": "Your Persona Result"
+    },
+    "expired": {
+      "title": "This result has expired",
+      "desc": "Guest results are kept for 14 days. This one is gone — but a fresh test only takes a few minutes.",
+      "cta": "Take a new test"
+    },
+    "teaser": {
+      "badge": "Shared result",
+      "title": "Someone discovered their persona!",
+      "desc": "Curious what yours looks like? The test is free and takes just a few minutes.",
+      "cta": "Find out my persona"
+    },
+    "hero": {
+      "youAre": "You are",
+      "sharedIs": "This persona is"
+    },
+    "grit": {
+      "title": "Persistence (GRIT)",
+      "band": {
+        "low": "Still warming up",
+        "medium": "Steady climber",
+        "high": "Unstoppable"
+      }
+    },
+    "traits": {
+      "title": "Your trait balance",
+      "EI": {
+        "first": "Extraverted",
+        "second": "Introverted"
+      },
+      "SN": {
+        "first": "Practical",
+        "second": "Imaginative"
+      },
+      "TF": {
+        "first": "Logical",
+        "second": "Empathetic"
+      },
+      "JP": {
+        "first": "Structured",
+        "second": "Spontaneous"
+      }
+    },
+    "summary": {
+      "title": "What your story says about you"
+    },
+    "wellbeing": {
+      "title": "We noticed your story carries some weight",
+      "desc": "Whatever you're going through, you don't have to carry it alone. Talking to someone can genuinely help.",
+      "resourceLabel": "Befrienders Worldwide — find a helpline",
+      "resourceUrl": "https://befrienders.org"
+    },
+    "mascot": {
+      "styleLabel": "Mascot style",
+      "styleA": "Style A",
+      "styleB": "Style B",
+      "alt": "{mbti} mascot"
+    },
+    "share": {
+      "button": "Share my persona",
+      "copied": "Link copied!"
+    },
+    "claim": {
+      "title": "Don't lose this version of you",
+      "desc": "Guest results disappear after 14 days. Save it forever with a free account — and get 3 tests every month.",
+      "cta": "Save my result"
     }
   }
 }

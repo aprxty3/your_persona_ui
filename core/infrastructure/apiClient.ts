@@ -10,7 +10,13 @@ import {
   type LoginRequest,
   type TokenPair,
 } from '@/core/domain/auth';
-import { QuestionListSchema } from '@/core/domain/assessment';
+import {
+  QuestionListSchema,
+  ResultSchema,
+  SubmitRequestSchema,
+  SubmitResponseSchema,
+  type SubmitRequest,
+} from '@/core/domain/assessment';
 import {
   clearSession,
   getAccessToken,
@@ -183,6 +189,32 @@ export const api = {
     return request(
       QuestionListSchema,
       `/v1/questions?locale=${encodeURIComponent(locale)}`,
+    );
+  },
+
+  // M3 — submit. Idempotency-Key comes from the assessment store (§4.2);
+  // CSRF header is added automatically above. Gemini runs synchronously on the
+  // BE (Waiting Room UX) — the fetch simply stays in flight for 3-8s.
+  submitAssessment(input: SubmitRequest, idempotencyKey: string) {
+    return request(SubmitResponseSchema, '/v1/assessment/submit', {
+      method: 'POST',
+      body: SubmitRequestSchema.parse(input),
+      headers: { 'Idempotency-Key': idempotencyKey },
+    });
+  },
+
+  // M4 — result detail. Full response for ANY link holder (FR-D8); teaser/blur
+  // for non-owners is FE rendering driven by `is_owner`, not BE field cuts.
+  getResult(resultId: string) {
+    return request(ResultSchema, `/v1/results/${encodeURIComponent(resultId)}`);
+  },
+
+  // M4 — mascot style persistence (FR-D11). Purely visual; owner-only on the BE.
+  setMascotStyle(resultId: string, style: 'style_a' | 'style_b') {
+    return request(
+      z.record(z.string(), z.unknown()),
+      `/v1/results/${encodeURIComponent(resultId)}/mascot-style`,
+      { method: 'PATCH', body: { mascot_style: style } },
     );
   },
 
