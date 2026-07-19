@@ -5,10 +5,6 @@ import {
   storeTokens,
 } from '@/core/infrastructure/session';
 
-// Zustand = the React reactivity layer on top of infrastructure/session.ts
-// (the real token source). access_token NEVER touches localStorage — module
-// memory only (AGENTS.md Security Rules).
-
 type AuthState = {
   isAuthenticated: boolean;
   setSession: (accessToken: string, refreshToken: string) => void;

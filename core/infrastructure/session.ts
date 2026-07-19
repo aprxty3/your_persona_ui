@@ -1,10 +1,3 @@
-// Credential storage per the security contract (AGENTS.md / Tech Doc §5.1):
-// - access_token: in-memory ONLY (module scope) — localStorage is FORBIDDEN.
-// - refresh_token: localStorage (deliberate decision following the BE's
-//   body-based transport; trade-off recorded in Tech Doc §5.1 & §12C).
-// This module lives in infrastructure so apiClient never has to import the
-// Zustand store (application layer) — the store wraps this module instead.
-
 const REFRESH_TOKEN_KEY = 'yp_refresh_token';
 const SESSION_FLAG_COOKIE = 'yp_session';
 

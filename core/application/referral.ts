@@ -1,7 +1,3 @@
-// Capture ?ref=CODE on the landing page → localStorage → used as
-// `referral_code` in the register payload (M5). Without this, FR-G1 never
-// works from the FE side (Tech Doc §6.3).
-
 const REF_KEY = 'yp_ref';
 
 export function captureReferralCode(searchParams: URLSearchParams): void {

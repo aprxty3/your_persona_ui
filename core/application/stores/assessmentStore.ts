@@ -1,11 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-// FR-B6: a mid-test refresh must NOT wipe answers → persist to localStorage.
-// The Idempotency-Key + payload snapshot (§4.2) also live here: the key is
-// created ONCE on the first submit, reused while the payload is unchanged,
-// and cleared on success. Fully consumed in M3 — structure locked since M1.
-
 export type AnswerMap = Record<string, string>; // question_id → value
 
 type AssessmentState = {
