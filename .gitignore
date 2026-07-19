@@ -56,3 +56,6 @@ AGENTS.md
 CHECKLIST.md
 CLAUDE.md
 TECHNICAL_DOCUMENTATION.md
+
+# AI agent skills — internal workflow docs, machine-specific (same class as AGENTS.md)
+.claude/
