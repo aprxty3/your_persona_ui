@@ -25,7 +25,7 @@ flowchart LR
     C --> H["core/application<br/>hooks"]
     H --> AC["core/infrastructure<br/>apiClient"]
     AC --> D["core/domain<br/>Zod schemas ⇄ swagger.json"]
-    AC -->|"envelope parse · 401→refresh→retry<br/>Idempotency-Key · X-CSRF-Token"| BE["controller-api<br/>api.yourpersonas.com/v1"]
+    AC -->|"envelope parse · 401→refresh→retry<br/>Idempotency-Key · X-CSRF-Token"| BE["controller-api<br/>your-personas.duckdns.org/v1"]
 ```
 
 ---
