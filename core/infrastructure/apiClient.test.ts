@@ -34,8 +34,9 @@ function makeLocalStorageStub() {
 
 const documentStub = makeDocumentStub();
 const localStorageStub = makeLocalStorageStub();
+const windowStub = { localStorage: localStorageStub };
 (globalThis as Record<string, unknown>).document = documentStub;
-(globalThis as Record<string, unknown>).window = { localStorage: localStorageStub };
+(globalThis as Record<string, unknown>).window = windowStub;
 
 const { api, ApiError } = await import('./apiClient');
 const { clearSession, getAccessToken, getRefreshToken, storeTokens } =
@@ -102,6 +103,10 @@ function callTo(pathname: string, nth = 0): RecordedCall {
 }
 
 beforeEach(() => {
+  // Other test files swap these globals — re-install ours per test so the
+  // suite stays order-independent.
+  (globalThis as Record<string, unknown>).document = documentStub;
+  (globalThis as Record<string, unknown>).window = windowStub;
   calls = [];
   routes = [];
   clearSession();
