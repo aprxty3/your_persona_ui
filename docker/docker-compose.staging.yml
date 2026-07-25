@@ -1,10 +1,3 @@
-# FE staging stack — mirrors docker-compose.prod.yml with its own service name so
-# the shared Caddy can route the staging domain separately:
-#   <fe-staging-domain> { reverse_proxy ui-staging:3000 }
-# The staging image is built from `develop` with staging NEXT_PUBLIC_* build-args
-# (API base URL points at the staging BE) — never deploy a prod image here or
-# vice versa; they are not interchangeable.
-
 name: your-persona-ui-staging
 
 networks:
