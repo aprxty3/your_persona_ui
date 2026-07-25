@@ -111,14 +111,29 @@ flowchart LR
 
 ---
 
-## Deployment
+## Deployment & CI/CD
 
 * **Bun runtime** in production (`oven/bun:alpine`, `bun server.js`), `output: 'standalone'` — Docker image target <150MB.
-* NGINX reverse proxy in front; co-located with controller-api + Postgres + Redis on a 4GB VPS.
+* Reverse proxy: the **shared Caddy** instance from the `controller-api` stack (one Caddy binds :80/:443 for all domains; the FE containers join the external `your-persona-shared` Docker network — see `docker/docker-compose.prod.yml` / `docker-compose.staging.yml`). Co-located with controller-api + Postgres + Redis on a 4GB VPS.
 * Cloudflare CDN caches static assets (mascots, JS bundles).
 
+### Branches & pipeline (`.github/workflows/ci.yml`)
+
+Two long-lived branches, both protected (PR + required checks):
+
+| Branch | On push | Deploy |
+|---|---|---|
+| `develop` | checks → image build+push (staging build-args) | **auto-deploy staging** |
+| `main` | checks → image build+push (production build-args) | **production, gated by approval** (GitHub environment `production`) |
+
+Checks: `secrets` (gitleaks) → `lint` / `typecheck` → `test` / `build` → `docker` (multi-arch `linux/amd64,linux/arm64` image pushed to GHCR as `ghcr.io/aprxty3/your_persona_ui:sha-<sha>`).
+
+**Important:** `NEXT_PUBLIC_*` values are inlined **at build time**, so the staging and production images are built with different build-args and are **not interchangeable** — each deploy job consumes the image from its own branch run.
+
+Deploy jobs are safe no-ops until the VPS secrets exist. Activation checklist (DuckDNS names, Caddyfile entries, VPS checkout dirs, Actions secrets `VPS_SSH_KEY`/`VPS_HOST`/`VPS_USER` + variables `FE_PROD_URL`/`FE_STAGING_URL`/`NEXT_PUBLIC_TURNSTILE_SITE_KEY`/`NEXT_PUBLIC_POSTHOG_KEY`): **issue FE-04**. Until the real Turnstile sitekey variable is set, production builds fall back to Cloudflare's always-pass test key — see **issue FE-05** before launch.
+
 ```bash
-docker build -f Dockerfile .
+docker build -f Dockerfile .   # local image build
 ```
 
 ---
