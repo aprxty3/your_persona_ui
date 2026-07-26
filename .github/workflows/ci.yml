@@ -50,12 +50,7 @@ jobs:
           bun-version: latest
       - run: bun install --frozen-lockfile
       - name: bun test
-        run: |
-          if find . -path ./node_modules -prune -o -type f \( -name '*.test.ts' -o -name '*.test.tsx' \) -print | grep -q .; then
-            bun test
-          else
-            echo "::notice::No test files yet — skipping. Write apiClient envelope/refresh tests to close M1 DoD."
-          fi
+        run: bun test
 
   build:
     runs-on: ubuntu-latest
