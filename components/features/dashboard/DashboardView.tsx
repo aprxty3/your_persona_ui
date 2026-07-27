@@ -74,7 +74,7 @@ export function DashboardView() {
         {data.quota_remaining > 0 ? (
           <Link
             href="/assessment"
-            className="mt-4 inline-block rounded-2xl bg-primary px-5 py-2.5 text-sm font-bold text-white shadow-soft hover:bg-primary-600"
+            className="mt-4 inline-block rounded-2xl bg-primary px-5 py-2.5 text-sm font-bold text-white shadow-soft hover:bg-primary-700"
           >
             {t('quota.ctaNewTest')}
           </Link>
