@@ -43,7 +43,10 @@ const { clearSession, getAccessToken, getRefreshToken, storeTokens } =
   await import('./session');
 
 // ---------------------------------------------------------------------------
-// fetch mock — routes by pathname so the test is immune to the BASE_URL env.
+// fetch mock — routes by pathname SUFFIX (not exact match) so the test stays
+// immune to whatever BASE_URL resolves to in a given environment — a bare
+// origin (http://localhost:8080), an absolute URL, or (since FE-03) a path
+// prefix like /api/be that adds extra pathname segments in front.
 // ---------------------------------------------------------------------------
 
 type RecordedCall = { pathname: string; method: string; headers: Record<string, string>; body: unknown };
@@ -93,7 +96,7 @@ globalThis.fetch = (async (input: string | URL | Request, init?: RequestInit) =>
   throw new Error(`Unmatched fetch: ${call.method} ${call.pathname}`);
 }) as typeof fetch;
 
-const callsTo = (pathname: string) => calls.filter((c) => c.pathname === pathname);
+const callsTo = (pathname: string) => calls.filter((c) => c.pathname.endsWith(pathname));
 
 /** Nth recorded call to a path — throws instead of returning undefined (strict index access). */
 function callTo(pathname: string, nth = 0): RecordedCall {
@@ -125,7 +128,7 @@ afterEach(() => {
 describe('envelope parsing', () => {
   test('{ success: true, data } resolves to the parsed data', async () => {
     route(
-      (c) => c.pathname === '/v1/results/r1/pdf-status',
+      (c) => c.pathname.endsWith('/v1/results/r1/pdf-status'),
       () => envelope({ success: true, data: { pdf_status: 'completed' } }),
     );
 
@@ -135,7 +138,7 @@ describe('envelope parsing', () => {
 
   test('{ success: false, error } throws ApiError carrying code/message/meta/requestId', async () => {
     route(
-      (c) => c.pathname === '/v1/auth/resend-email-otp',
+      (c) => c.pathname.endsWith('/v1/auth/resend-email-otp'),
       () =>
         envelope(
           {
@@ -159,7 +162,7 @@ describe('envelope parsing', () => {
 
   test('non-envelope 5xx body maps to SERVICE_UNAVAILABLE', async () => {
     route(
-      (c) => c.pathname === '/v1/results/r1/pdf-status',
+      (c) => c.pathname.endsWith('/v1/results/r1/pdf-status'),
       () => new Response('<html>Bad Gateway</html>', { status: 502 }),
     );
 
@@ -170,7 +173,7 @@ describe('envelope parsing', () => {
 
   test('non-envelope 2xx body maps to INTERNAL_ERROR', async () => {
     route(
-      (c) => c.pathname === '/v1/results/r1/pdf-status',
+      (c) => c.pathname.endsWith('/v1/results/r1/pdf-status'),
       () => new Response('not json', { status: 200 }),
     );
 
@@ -180,7 +183,7 @@ describe('envelope parsing', () => {
 
   test('network failure maps to NETWORK_ERROR with status 0', async () => {
     route(
-      (c) => c.pathname === '/v1/results/r1/pdf-status',
+      (c) => c.pathname.endsWith('/v1/results/r1/pdf-status'),
       () => {
         throw new TypeError('fetch failed');
       },
@@ -201,7 +204,7 @@ const unauthorized = (code = 'UNAUTHORIZED') =>
 
 function routeRefreshSuccess() {
   route(
-    (c) => c.pathname === '/v1/auth/refresh',
+    (c) => c.pathname.endsWith('/v1/auth/refresh'),
     () =>
       envelope({
         success: true,
@@ -213,10 +216,10 @@ function routeRefreshSuccess() {
 describe('401 → refresh → retry interceptor', () => {
   test('401 triggers refresh, replays the request with the new token, and rotates the stored pair', async () => {
     storeTokens('old-access', 'old-refresh');
-    route((c) => c.pathname === '/v1/results/r1/pdf-status', () => unauthorized(), 1);
+    route((c) => c.pathname.endsWith('/v1/results/r1/pdf-status'), () => unauthorized(), 1);
     routeRefreshSuccess();
     route(
-      (c) => c.pathname === '/v1/results/r1/pdf-status',
+      (c) => c.pathname.endsWith('/v1/results/r1/pdf-status'),
       () => envelope({ success: true, data: { pdf_status: 'completed' } }),
     );
 
@@ -234,9 +237,9 @@ describe('401 → refresh → retry interceptor', () => {
 
   test('refresh failure (INVALID_TOKEN) clears the session and rethrows the original error', async () => {
     storeTokens('old-access', 'old-refresh');
-    route((c) => c.pathname === '/v1/results/r1/pdf-status', () => unauthorized(), 1);
+    route((c) => c.pathname.endsWith('/v1/results/r1/pdf-status'), () => unauthorized(), 1);
     route(
-      (c) => c.pathname === '/v1/auth/refresh',
+      (c) => c.pathname.endsWith('/v1/auth/refresh'),
       () =>
         envelope(
           { success: false, error: { code: 'INVALID_TOKEN', message: 'Denylisted' } },
@@ -257,8 +260,8 @@ describe('401 → refresh → retry interceptor', () => {
 
   test('two parallel 401s share ONE refresh call (single-flight race guard)', async () => {
     storeTokens('old-access', 'old-refresh');
-    route((c) => c.pathname === '/v1/results/rA/pdf-status', () => unauthorized(), 1);
-    route((c) => c.pathname === '/v1/results/rB/pdf-status', () => unauthorized(), 1);
+    route((c) => c.pathname.endsWith('/v1/results/rA/pdf-status'), () => unauthorized(), 1);
+    route((c) => c.pathname.endsWith('/v1/results/rB/pdf-status'), () => unauthorized(), 1);
     routeRefreshSuccess();
     route(
       (c) => c.pathname.endsWith('/pdf-status'),
@@ -275,13 +278,13 @@ describe('401 → refresh → retry interceptor', () => {
   test('TOKEN_VERSION_MISMATCH on 401 goes through the same refresh → retry path', async () => {
     storeTokens('old-access', 'old-refresh');
     route(
-      (c) => c.pathname === '/v1/results/r1/pdf-status',
+      (c) => c.pathname.endsWith('/v1/results/r1/pdf-status'),
       () => unauthorized('TOKEN_VERSION_MISMATCH'),
       1,
     );
     routeRefreshSuccess();
     route(
-      (c) => c.pathname === '/v1/results/r1/pdf-status',
+      (c) => c.pathname.endsWith('/v1/results/r1/pdf-status'),
       () => envelope({ success: true, data: { pdf_status: 'completed' } }),
     );
 
@@ -293,11 +296,11 @@ describe('401 → refresh → retry interceptor', () => {
   test('TOKEN_VERSION_MISMATCH with failing refresh = logout (session cleared)', async () => {
     storeTokens('old-access', 'old-refresh');
     route(
-      (c) => c.pathname === '/v1/results/r1/pdf-status',
+      (c) => c.pathname.endsWith('/v1/results/r1/pdf-status'),
       () => unauthorized('TOKEN_VERSION_MISMATCH'),
     );
     route(
-      (c) => c.pathname === '/v1/auth/refresh',
+      (c) => c.pathname.endsWith('/v1/auth/refresh'),
       () =>
         envelope(
           { success: false, error: { code: 'INVALID_TOKEN', message: 'Rotated out' } },
@@ -311,7 +314,7 @@ describe('401 → refresh → retry interceptor', () => {
   });
 
   test('guest (no refresh token): 401 is thrown as-is, refresh never attempted', async () => {
-    route((c) => c.pathname === '/v1/results/r1/pdf-status', () => unauthorized());
+    route((c) => c.pathname.endsWith('/v1/results/r1/pdf-status'), () => unauthorized());
 
     const err = await api.getPdfStatus('r1').catch((e) => e);
     expect(err.code).toBe('UNAUTHORIZED');
@@ -322,7 +325,7 @@ describe('401 → refresh → retry interceptor', () => {
   test('auth endpoints (skipAuthRefresh): 401 from login never triggers refresh', async () => {
     storeTokens('old-access', 'old-refresh'); // even with a stored session
     route(
-      (c) => c.pathname === '/v1/auth/login',
+      (c) => c.pathname.endsWith('/v1/auth/login'),
       () =>
         envelope(
           { success: false, error: { code: 'INVALID_CREDENTIALS', message: 'Nope' } },
@@ -339,7 +342,7 @@ describe('401 → refresh → retry interceptor', () => {
 
   test('a retried request that 401s again is NOT retried a second time (no infinite loop)', async () => {
     storeTokens('old-access', 'old-refresh');
-    route((c) => c.pathname === '/v1/results/r1/pdf-status', () => unauthorized());
+    route((c) => c.pathname.endsWith('/v1/results/r1/pdf-status'), () => unauthorized());
     routeRefreshSuccess();
 
     const err = await api.getPdfStatus('r1').catch((e) => e);
@@ -373,7 +376,7 @@ describe('header injection', () => {
 
   test('X-CSRF-Token from the csrf_token cookie rides along on non-GET requests', async () => {
     documentStub.cookie = 'csrf_token=csrf-abc; path=/';
-    route((c) => c.pathname === '/v1/assessment/submit', submitOk);
+    route((c) => c.pathname.endsWith('/v1/assessment/submit'), submitOk);
 
     await api.submitAssessment(submitInput, 'key-1');
 
@@ -383,7 +386,7 @@ describe('header injection', () => {
   test('GET requests carry no X-CSRF-Token even when the cookie exists', async () => {
     documentStub.cookie = 'csrf_token=csrf-abc; path=/';
     route(
-      (c) => c.pathname === '/v1/results/r1/pdf-status',
+      (c) => c.pathname.endsWith('/v1/results/r1/pdf-status'),
       () => envelope({ success: true, data: { pdf_status: 'pending' } }),
     );
 
@@ -393,7 +396,7 @@ describe('header injection', () => {
   });
 
   test('non-GET without the cookie: header simply absent (guest pre-prime)', async () => {
-    route((c) => c.pathname === '/v1/assessment/submit', submitOk);
+    route((c) => c.pathname.endsWith('/v1/assessment/submit'), submitOk);
 
     await api.submitAssessment(submitInput, 'key-1');
 
@@ -401,7 +404,7 @@ describe('header injection', () => {
   });
 
   test('Idempotency-Key is sent on submit alongside the JSON body', async () => {
-    route((c) => c.pathname === '/v1/assessment/submit', submitOk);
+    route((c) => c.pathname.endsWith('/v1/assessment/submit'), submitOk);
 
     await api.submitAssessment(submitInput, 'key-123');
 

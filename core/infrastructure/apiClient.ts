@@ -51,7 +51,10 @@ import {
 // X-CSRF-Token header, Idempotency-Key injection, credentials include
 // (session_id/csrf_token cookies).
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8080';
+// FE-03: same-origin path proxied by next.config.mjs's rewrites() to the BE —
+// keeps session_id/csrf_token cookies first-party no matter the domain
+// topology. Overridable for the rare case of calling the BE directly.
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? '/api/be';
 
 export class ApiError extends Error {
   constructor(

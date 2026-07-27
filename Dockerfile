@@ -11,7 +11,11 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 # NEXT_PUBLIC_* values are inlined at build time — override via --build-arg in CI.
-ARG NEXT_PUBLIC_API_BASE_URL
+# NEXT_PUBLIC_API_BASE_URL defaults to the same-origin proxy path (FE-03) — this
+# is now a constant across every environment (dev/staging/prod), since the
+# actual BE address is supplied separately, at container runtime, via
+# API_INTERNAL_URL (docker-compose `environment:` — see docker/*.yml).
+ARG NEXT_PUBLIC_API_BASE_URL=/api/be
 ARG NEXT_PUBLIC_TURNSTILE_SITE_KEY
 ARG NEXT_PUBLIC_POSTHOG_KEY
 ARG NEXT_PUBLIC_POSTHOG_HOST

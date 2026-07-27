@@ -7,7 +7,10 @@ import { ResultSchema, gritBand } from '@/core/domain/assessment';
 // This route runs server-side WITHOUT browser credentials → the BE treats it
 // as a non-owner link holder, which still gets the full data (FR-D8).
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8080';
+// Server-to-server (no browser, no cookies) — talks to the BE directly via
+// the same runtime var next.config.mjs's rewrite uses (FE-03), not the
+// browser-facing NEXT_PUBLIC_API_BASE_URL proxy path.
+const BASE_URL = process.env.API_INTERNAL_URL ?? 'http://localhost:8080';
 
 export const runtime = 'edge';
 
