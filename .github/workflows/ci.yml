@@ -73,9 +73,10 @@ jobs:
     outputs:
       image_sha_tag: sha-${{ github.sha }}
     env:
-      API_BASE_URL: ${{ github.ref == 'refs/heads/main'
-        && (vars.NEXT_PUBLIC_API_BASE_URL_PROD || 'https://your-personas.duckdns.org')
-        || (vars.NEXT_PUBLIC_API_BASE_URL_STG || 'https://your-personas-stg.duckdns.org') }}
+      # FE-03: NEXT_PUBLIC_API_BASE_URL no longer varies per branch — it's
+      # always the same-origin proxy path (Dockerfile default /api/be); the
+      # real BE address is supplied at container runtime via API_INTERNAL_URL
+      # (docker-compose environment, not a build-arg — see docker/*.yml).
       TURNSTILE_SITE_KEY: ${{ github.ref == 'refs/heads/main'
         && (vars.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '1x00000000000000000000AA')
         || '1x00000000000000000000AA' }}
@@ -123,7 +124,6 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            NEXT_PUBLIC_API_BASE_URL=${{ env.API_BASE_URL }}
             NEXT_PUBLIC_TURNSTILE_SITE_KEY=${{ env.TURNSTILE_SITE_KEY }}
             NEXT_PUBLIC_POSTHOG_KEY=${{ env.POSTHOG_KEY }}
             NEXT_PUBLIC_POSTHOG_HOST=${{ env.POSTHOG_HOST }}
