@@ -347,7 +347,9 @@
       "badge": "Hasil yang dibagikan",
       "title": "Seseorang baru menemukan personanya!",
       "desc": "Penasaran punyamu kayak apa? Tesnya gratis dan cuma butuh beberapa menit.",
-      "cta": "Cari tahu personaku"
+      "cta": "Cari tahu personaku",
+      "scoresTitle": "Intip sekilas skornya",
+      "dimmedLabel": "Terkunci"
     },
     "hero": {
       "youAre": "Kamu adalah",

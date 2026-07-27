@@ -356,6 +356,64 @@ function PdfDownloadButton({ resultId }: { resultId: string }) {
 
 // ---------------------------------------------------------------------------
 
+// FR-D4 (decision 2026-07-27): bars stay the chosen deviation from PRD's radar
+// chart (more legible at 360px for 5 dimensions); the teaser effect it still
+// owes us is "1 axis dimmed" — GRIT is the axis chosen (it's the single most
+// prominent standalone metric in FullResult, so hiding it carries the
+// strongest claim-to-reveal pull). Trait bars stay visible in the teaser —
+// only GRIT is blurred, same rendering-only blur pattern as FR-D3's summary.
+function TeaserScorePreview({ result }: { result: Result }) {
+  const t = useTranslations('results');
+  const scores = result.trait_scores;
+  // Same defensive guard as TraitBars — pre-scoring zero-value rows hide this.
+  if (!scores || TRAIT_PAIRS.every((k) => !scores[k])) return null;
+
+  return (
+    <Card className="text-left">
+      <h2 className="font-extrabold text-slate-800">{t('teaser.scoresTitle')}</h2>
+      <div className="mt-4 space-y-4">
+        <div className="relative overflow-hidden rounded-lg">
+          <div aria-hidden className="select-none blur-sm">
+            <div className="mb-1 flex justify-between text-xs font-bold text-slate-600">
+              <span>{t('grit.title')}</span>
+              <span>{result.grit_score}%</span>
+            </div>
+            <div className="h-3 overflow-hidden rounded-full bg-primary-100">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-secondary-500 to-primary"
+                style={{ width: `${result.grit_score}%` }}
+              />
+            </div>
+          </div>
+          <div className="absolute inset-0 flex items-center justify-center bg-white/60">
+            <span className="text-[11px] font-bold text-accent-700">
+              🔒 {t('teaser.dimmedLabel')}
+            </span>
+          </div>
+        </div>
+
+        {TRAIT_PAIRS.map((pair) => {
+          const value = scores[pair] ?? 50;
+          return (
+            <div key={pair}>
+              <div className="mb-1 flex justify-between text-xs font-bold text-slate-600">
+                <span>{t(`traits.${pair}.first`)}</span>
+                <span>{t(`traits.${pair}.second`)}</span>
+              </div>
+              <div className="h-3 overflow-hidden rounded-full bg-primary-100">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-primary to-secondary-500"
+                  style={{ width: `${value}%` }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </Card>
+  );
+}
+
 function TeaserResult({ result }: { result: Result }) {
   const t = useTranslations('results');
 
@@ -373,6 +431,8 @@ function TeaserResult({ result }: { result: Result }) {
           {result.mbti_type || '????'}
         </h1>
       </div>
+
+      <TeaserScorePreview result={result} />
 
       {/* Blur = pure FE rendering (FR-D3/D4); the data is intentionally there */}
       <Card className="relative overflow-hidden text-left">
