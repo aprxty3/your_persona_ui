@@ -205,7 +205,11 @@ export default async function LandingPage({
 
       {/* ---------- Final CTA ---------- */}
       <section className="mx-auto max-w-6xl px-4 pb-20">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-secondary-500 to-accent p-10 text-center text-white sm:p-16">
+        {/* via-secondary-700 not -500 (FE-06): the h2/p below sit directly on
+            this gradient in white text — secondary-500 vs white measures only
+            2.49:1, failing WCAG AA even at the relaxed large-text 3:1 floor;
+            secondary-700 measures 5.47:1. */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-secondary-700 to-accent p-10 text-center text-white sm:p-16">
           <div aria-hidden className="absolute -right-10 -top-10 h-48 w-48 animate-blob rounded-full bg-white/10" />
           <div aria-hidden className="absolute -bottom-14 -left-10 h-56 w-56 animate-blob rounded-full bg-white/10" />
           <h2 className="text-3xl font-extrabold sm:text-4xl">{t('finalCta.title')}</h2>
