@@ -11,5 +11,12 @@ services:
     restart: unless-stopped
     ports:
       - "127.0.0.1:3001:3000"
+    environment:
+      # FE-03: next.config.mjs's rewrite proxy target, read at container start.
+      # Unlike prod, controller-api's api-staging container already joins the
+      # `shared` network (see docker-compose gotcha notes in
+      # controller-api/docs), so this is a direct container-to-container call —
+      # no round trip through the public domain/Caddy needed for staging.
+      - API_INTERNAL_URL=http://api-staging:8080
     networks:
       - shared
