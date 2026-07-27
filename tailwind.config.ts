@@ -12,7 +12,14 @@ const config: Config = {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#0E9AA8',
+          // FE-06 (WCAG AA audit, 2026-07-27): white text on bare `bg-primary`
+          // (the #0E9AA8 500-shade) measures 3.38:1 — fails AA's 4.5:1 floor
+          // for normal-size text (the primary Button variant, LocaleSwitcher,
+          // and the mascot style switcher all render white text at 12-16px on
+          // it). DEFAULT decoupled from `500` to the existing #0B7B86 (former
+          // `600`) shade instead, which measures 5.01:1 — passes. `500` is
+          // untouched (still #0E9AA8) for non-text uses like gradient stops.
+          DEFAULT: '#0B7B86',
           50: '#EBF9FB',
           100: '#D0F1F4',
           200: '#A2E3E9',
