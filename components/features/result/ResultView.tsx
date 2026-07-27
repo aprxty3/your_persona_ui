@@ -51,7 +51,7 @@ export function ResultView({ resultId }: { resultId: string }) {
         <p className="mt-2 text-sm text-slate-600">{t('expired.desc')}</p>
         <Link
           href="/onboarding"
-          className="mt-5 inline-block rounded-2xl bg-primary px-6 py-3 font-bold text-white shadow-soft hover:bg-primary-600"
+          className="mt-5 inline-block rounded-2xl bg-primary px-6 py-3 font-bold text-white shadow-soft hover:bg-primary-700"
         >
           {t('expired.cta')}
         </Link>
