@@ -2,11 +2,11 @@
 
 This is a runbook, not an essay — follow it top to bottom for a fresh deploy. A second person should be able to run this from nothing but this file and a fresh VM, without asking questions.
 
-Scope note: this FE has no database, no migrations, and no runtime secrets — every `NEXT_PUBLIC_*` value is baked into the Docker image **at build time** (see `.github/workflows/ci.yml`'s `docker` job). That makes this runbook much shorter than `controller-api`'s: there is nothing to seed, migrate, or back up here, and the staging/production images are two separate builds, not the same image with different env vars.
+Scope note: this FE has no database, no migrations, and no persisted runtime secrets — `NEXT_PUBLIC_TURNSTILE_SITE_KEY`/`NEXT_PUBLIC_POSTHOG_*` are baked into the Docker image **at build time** (see `.github/workflows/ci.yml`'s `docker` job), but `NEXT_PUBLIC_API_BASE_URL` is now a constant (`/api/be`) and the real BE address (`API_INTERNAL_URL`) is a plain runtime env var set per docker-compose file (FE-03) — nothing to seed, migrate, or back up here.
 
 ## Prerequisites (do these once, before touching the VM)
 
-1. **Decide the domain topology first** — see `your_persona_ui` issue FE-03 (`SameSite=Strict` on the BE's `session_id` cookie silently breaks the Guest flow if FE and BE end up on different sites, e.g. two flat DuckDNS names). Whatever this resolves to changes what `NEXT_PUBLIC_API_BASE_URL` build-arg the `docker` job should use — do this before step 2.
+1. **Domain topology (FE-03) — already decided, nothing to do here.** `next.config.mjs` proxies `/api/be/*` to `API_INTERNAL_URL` so `session_id`/`csrf_token` cookies stay first-party no matter which sites FE/BE end up on (two flat DuckDNS names count as different sites for `SameSite=Strict`). `API_INTERNAL_URL` is already set correctly per environment in `docker/docker-compose.prod.yml` / `docker-compose.staging.yml` — nothing to change during activation.
 2. **DNS**: register the FE production + staging domains (DuckDNS: two flat names, e.g. `your-personas-app.duckdns.org` / `your-personas-app-stg.duckdns.org` — DuckDNS does not support subdomains of an existing name) pointing at the same VM IP the `controller-api` stack already runs on.
 3. **Caddyfile** (lives in the `controller-api` repo, one shared Caddy serves every domain on the VM): add two site blocks routing to this FE's container names —
    ```
@@ -91,14 +91,13 @@ This is deliberately a one-off shell `export`, not written into any file — the
 cd /opt/your-persona/your-persona-ui
 git checkout <commit-sha>
 docker build -t ghcr.io/aprxty3/your_persona_ui:latest \
-  --build-arg NEXT_PUBLIC_API_BASE_URL=<prod-or-staging-api-url> \
   --build-arg NEXT_PUBLIC_TURNSTILE_SITE_KEY=<sitekey> \
   --build-arg NEXT_PUBLIC_POSTHOG_KEY=<key> \
   --build-arg NEXT_PUBLIC_POSTHOG_HOST=<host> \
   .
 docker compose -f docker/docker-compose.prod.yml up -d --no-build
 ```
-Building locally means supplying the same `NEXT_PUBLIC_*` build-args the CI `docker` job would have used for that branch — a local build without them silently bakes in empty/dev values (Turnstile falls back to the test sitekey, API base URL is unset). Check `.github/workflows/ci.yml`'s `docker` job env block for the exact values in effect at the time.
+Building locally means supplying the same `NEXT_PUBLIC_*` build-args the CI `docker` job would have used for that branch — a local build without them silently bakes in empty/dev values (Turnstile falls back to the test sitekey). `NEXT_PUBLIC_API_BASE_URL` needs no build-arg (Dockerfile defaults it to `/api/be`, FE-03); `API_INTERNAL_URL` is already set in `docker-compose.prod.yml`'s `environment:` block, not something this build step touches. Check `.github/workflows/ci.yml`'s `docker` job env block for the exact Turnstile/PostHog values in effect at the time.
 
 ## Reference — what's already handled by code, not this runbook
 
