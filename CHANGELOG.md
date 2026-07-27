@@ -5,6 +5,33 @@ Conventions: `[A]` Added · `[C]` Changed · `[F]` Fixed · `[D]` Deprecated · 
 
 ---
 
+## [UNRELEASED] — 2026-07-27
+
+### GitHub issue triage (FE-02 through FE-15) — staging deployment focus
+
+#### [A] FE-03: same-origin API proxy resolving the SameSite cookie break (PR #39)
+- `next.config.mjs` now rewrites `/api/be/:path*` to `API_INTERNAL_URL` — the browser always calls the same origin it's already on, in every environment, so `session_id`/`csrf_token` (`SameSite=Strict`) stay first-party even when FE and BE end up on different DuckDNS names (two flat subdomains count as different sites).
+- `API_INTERNAL_URL` is a runtime env var (docker-compose `environment:`), not a build-arg — verified empirically that Next.js re-reads it at server start rather than freezing it into the standalone build.
+- `NEXT_PUBLIC_API_BASE_URL` is now a constant (`/api/be`) across every environment; CI's `docker` job no longer branches on it. `app/api/og/route.tsx` (server-to-server, no cookies) now reads `API_INTERNAL_URL` directly instead.
+
+#### [A] FE-11: Teaser mode score preview with GRIT dimmed (PR #40)
+- Decision: keep trait bars over a radar chart (PRD FR-D4 deviation, matches the issue's own recommendation — bars read better at 360px for 5 dimensions).
+- `TeaserResult` now shows the 4 trait bars at real values with GRIT blurred/locked (🔒) — same rendering-only blur pattern as the existing AI-summary teaser (FR-D3).
+
+#### [F] FE-06: WCAG AA contrast failures on primary/secondary + white text (PR #42)
+- Computed actual contrast ratios for the brand palette: `accent` (purple, the one PRD flagged as risky) passes at 5.38:1, but `primary` DEFAULT only reaches 3.38:1 (fails the 4.5:1 floor) and `secondary` DEFAULT only 2.49:1 (fails even the relaxed 3:1 large-text floor) — both used with white text in real components (the primary `Button` variant, `LocaleSwitcher`, the mascot style switcher, and the landing page's final-CTA gradient).
+- `primary.DEFAULT` decoupled from `primary.500` to the existing `#0B7B86` shade (5.01:1, passes); hover states bumped to `-700` to keep a visible darken-on-hover; landing gradient's `via-secondary-500` swapped to `-700` (5.47:1).
+
+#### [C] FE-15: migrated `next lint` (deprecated, removed in Next 16) to ESLint CLI flat config (PR #41)
+- `eslint.config.mjs` (flat config via `FlatCompat`, keeps `next/core-web-vitals`) replaces `.eslintrc.json`; `lint` script is now `eslint .`.
+- Flat config only ignores `node_modules` by default (no implicit directory scoping like `next lint` had) — added an explicit `.next/**` ignore, and fixed one new-but-real warning from now covering root config files `next lint` used to skip (`postcss.config.mjs`'s anonymous default export).
+
+#### [C] FE-13: doc drift fixes (local-only files, no PR — see issue #13 comment)
+- `AGENTS.md`/`TECHNICAL_DOCUMENTATION.md`/`CHECKLIST.md` corrected (mascot extension, NGINX→Caddy, access token TTL 15min→6h, stale bun-not-installed note) and `psyche-assessment-docs/PRD-psyche-assessment-mvp.md`'s FE status column synced against what's actually coded per `CHECKLIST.md`'s own M2-M4 DoD notes.
+
+### Deferred (needs a live browser/device, external account, or is explicitly blocked)
+FE-02, FE-05, FE-07, FE-08, FE-09, FE-10, FE-12, FE-14 — each has a status comment on its GitHub issue explaining why and what's needed before it can be picked up. FE-04 (VPS activation) is partially done: checkout directories are staged on the VPS, but DNS registration, the shared Caddyfile edit, and GitHub Actions secrets were deliberately left for the owner (see issue #4 comment).
+
 ## [UNRELEASED] — 2026-07-26
 
 #### [C] Deployment docs corrected to match the actual shared-Caddy topology
