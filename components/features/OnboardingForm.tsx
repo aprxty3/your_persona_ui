@@ -13,9 +13,9 @@ import { GuestStatusSchema, LocaleSchema } from '@/core/domain/guestSession';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 
-// FR-A5–A7: onboarding form + microcopy + age 13+ checkbox & privacy notice.
+// onboarding form + microcopy + age 13+ checkbox & privacy notice.
 // NO Turnstile widget — the BE deliberately does not validate it on
-// /guest-session (§5.3); protection there is per-IP rate limiting + per-session quota.
+// /guest-session; protection there is per-IP rate limiting + per-session quota.
 
 const statusOptions = GuestStatusSchema.options;
 
@@ -65,7 +65,6 @@ export function OnboardingForm() {
         status: values.status,
         locale: LocaleSchema.parse(locale),
       },
-      // Success → ready for the questions (M3). onboarding_completed fires in the hook.
       { onSuccess: () => router.push('/assessment') },
     );
   });

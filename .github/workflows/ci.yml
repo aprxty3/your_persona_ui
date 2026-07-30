@@ -73,10 +73,6 @@ jobs:
     outputs:
       image_sha_tag: sha-${{ github.sha }}
     env:
-      # FE-03: NEXT_PUBLIC_API_BASE_URL no longer varies per branch — it's
-      # always the same-origin proxy path (Dockerfile default /api/be); the
-      # real BE address is supplied at container runtime via API_INTERNAL_URL
-      # (docker-compose environment, not a build-arg — see docker/*.yml).
       TURNSTILE_SITE_KEY: ${{ github.ref == 'refs/heads/main'
         && (vars.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '1x00000000000000000000AA')
         || '1x00000000000000000000AA' }}

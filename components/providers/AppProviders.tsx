@@ -20,8 +20,6 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     initAnalytics();
-    // Boot refresh (§5.1): a new tab with a persisted refresh_token → fill
-    // the access token into memory in the background, then sync the store.
     void api.bootstrapSession().then(() => syncFromSession());
   }, [syncFromSession]);
 

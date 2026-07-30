@@ -16,10 +16,7 @@ const base =
 
 const variants: Record<Variant, string> = {
   primary:
-    // hover:bg-primary-700 (not -600) — DEFAULT is now #0B7B86 (FE-06, was
-    // -600's value), so -600 would no longer visibly darken on hover.
     'bg-primary text-white shadow-soft hover:bg-primary-700 hover:shadow-pop',
-  // accent is ONLY for the most important CTAs — don't sprinkle it everywhere (§6.1).
   accent:
     'bg-accent text-white shadow-pop hover:bg-accent-700',
   outline:

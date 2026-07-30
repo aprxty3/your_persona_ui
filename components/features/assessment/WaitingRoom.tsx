@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 
-// M3 — Waiting Room (FR-C1). The submit request itself is the wait: Gemini
+// Waiting Room. The submit request itself is the wait: Gemini
 // runs synchronously on the BE (3-8s by design), so this overlay lives for
 // exactly as long as the real response takes — no fake fixed timer.
 

@@ -15,9 +15,6 @@ import { LocaleSchema } from '@/core/domain/guestSession';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 
-// M5 — settings: locale preference (FR-I3), referral code + aggregate stats
-// (FR-G1, UU PDP: no invitee identity ever), account deletion with 14-day
-// grace (FR-G2/G2a).
 
 export function SettingsView() {
   const t = useTranslations('settings');
@@ -41,7 +38,7 @@ export function SettingsView() {
   );
 }
 
-// ---- Locale preference (FR-I3) --------------------------------------------
+// ---- Locale preference  --------------------------------------------
 
 function LocaleSection() {
   const t = useTranslations('settings.locale');
@@ -71,9 +68,8 @@ function LocaleSection() {
             type="button"
             onClick={() => onSwitch(l)}
             disabled={updateProfile.isPending}
-            className={`rounded-xl px-4 py-1.5 text-xs font-bold transition-colors ${
-              locale === l ? 'bg-primary text-white' : 'text-slate-500 hover:bg-primary-50'
-            }`}
+            className={`rounded-xl px-4 py-1.5 text-xs font-bold transition-colors ${locale === l ? 'bg-primary text-white' : 'text-slate-500 hover:bg-primary-50'
+              }`}
           >
             {l.toUpperCase()}
           </button>
@@ -83,7 +79,7 @@ function LocaleSection() {
   );
 }
 
-// ---- Referral (FR-G1) ------------------------------------------------------
+// ---- Referral  ------------------------------------------------------
 
 function ReferralSection() {
   const t = useTranslations('settings.referral');
@@ -139,7 +135,7 @@ function ReferralSection() {
   );
 }
 
-// ---- Account deletion (FR-G2/G2a) -----------------------------------------
+// ---- Account deletion  -----------------------------------------
 
 function DeletionSection() {
   const t = useTranslations('settings.deletion');

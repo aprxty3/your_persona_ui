@@ -3,8 +3,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/core/infrastructure/apiClient';
 
-// M5 — Member dashboard (Epic F). Member-only endpoints: a 401 goes through
-// the apiClient refresh interceptor automatically.
 
 export function useDashboard() {
   return useQuery({

@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next';
 
-// FR-J1: marketing pages ONLY — NEVER include /results (personal data)
+// marketing pages ONLY — NEVER include /results (personal data)
 // or the auth pages.
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = 'https://yourpersonas.com';

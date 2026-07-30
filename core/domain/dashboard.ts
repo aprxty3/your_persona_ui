@@ -1,7 +1,6 @@
 import { z } from 'zod';
 
-// GET /v1/user-dashboard (fully consumed in M5 — schema prepared since M1 per
-// the checklist so the contract is locked once in core/domain).
+// GET /v1/user-dashboard.
 
 export const GritTrendPointSchema = z.object({
   result_id: z.string(),

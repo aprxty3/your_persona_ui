@@ -11,8 +11,6 @@ import type { HistoryItem } from '@/core/domain/dashboard';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 
-// FR-F5 — paginated test history + PDF re-download (free within quota, 1
-// result = 1 PDF, re-download always free).
 
 export function HistoryList() {
   const t = useTranslations('dashboard.history');
@@ -66,7 +64,7 @@ function HistoryRow({ item }: { item: HistoryItem }) {
   const t = useTranslations('dashboard.history');
   const locale = useLocale();
   const download = useDownloadPdf();
-  // Poll only after a download attempt found the PDF not ready yet (§4.3).
+  // Poll only after a download attempt found the PDF not ready yet.
   const [pollingWanted, setPollingWanted] = useState(false);
   const pdfStatus = usePdfStatus(item.result_id, pollingWanted);
 

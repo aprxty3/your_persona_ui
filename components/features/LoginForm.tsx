@@ -14,9 +14,9 @@ import { Input } from '@/components/ui/Input';
 
 // AUTH MENU IMPLEMENTATION EXAMPLE (login) — template for register/forgot in M5.
 // Patterns demonstrated here:
-// 1. Turnstile (§5.3): widget token → `cf_turnstile_response` field;
+// 1. Turnstile: widget token → `cf_turnstile_response` field;
 //    TURNSTILE_VERIFICATION_FAILED → reset the widget, FORM INPUT IS KEPT.
-// 2. §9 error mapping: INVALID_CREDENTIALS / EMAIL_NOT_VERIFIED /
+// 2. Error mapping: INVALID_CREDENTIALS / EMAIL_NOT_VERIFIED /
 //    ACCOUNT_LOCKED (423) / RATE_LIMITED per code, not one generic message.
 // 3. Token pair → authStore (access in-memory, refresh localStorage) via hook.
 
@@ -63,7 +63,7 @@ export function LoginForm() {
             err instanceof ApiError &&
             err.code === 'TURNSTILE_VERIFICATION_FAILED'
           ) {
-            // §5.3 — the challenge is repeated, form input is NOT cleared.
+            // the challenge is repeated, form input is NOT cleared.
             turnstileRef.current?.reset();
             setTurnstileToken(null);
           }
@@ -80,7 +80,7 @@ export function LoginForm() {
       case 'INVALID_CREDENTIALS':
         return t('errors.invalidCredentials');
       case 'EMAIL_NOT_VERIFIED':
-        return t('errors.emailNotVerified'); // M5: redirect to the OTP page
+        return t('errors.emailNotVerified'); // redirect to the OTP page
       case 'ACCOUNT_LOCKED':
         return t('errors.accountLocked');
       case 'TURNSTILE_VERIFICATION_FAILED':

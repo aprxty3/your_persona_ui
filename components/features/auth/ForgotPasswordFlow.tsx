@@ -13,10 +13,6 @@ import { ApiError } from '@/core/infrastructure/apiClient';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 
-// M5 — forgot/reset password, the deliberate 3-step contract (FR-H4):
-// 1. email + Turnstile → ALWAYS a generic 200 (anti-enumeration)
-// 2. OTP → short-lived reset_token (single-use on the BE)
-// 3. new password + reset_token → auto-login (all old sessions revoked)
 
 type Step = 'email' | 'otp' | 'password';
 
@@ -40,7 +36,6 @@ export function ForgotPasswordFlow() {
   const turnstileRef = useRef<TurnstileInstance>(null);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
-  // ---- Step 1: email ----
   const onSendOtp = () => {
     if (!/.+@.+\..+/.test(email)) {
       setLocalError(t('errors.emailInvalid'));
@@ -66,7 +61,6 @@ export function ForgotPasswordFlow() {
     );
   };
 
-  // ---- Step 2: OTP → reset_token ----
   const onVerifyOtp = () => {
     if (otp.length !== 6) return;
     verifyOtp.mutate(
@@ -80,7 +74,6 @@ export function ForgotPasswordFlow() {
     );
   };
 
-  // ---- Step 3: new password ----
   const onReset = () => {
     if (password.length < 10) {
       setLocalError(t('errors.passwordMin'));
@@ -137,11 +130,10 @@ export function ForgotPasswordFlow() {
         {(['email', 'otp', 'password'] as const).map((s, i) => (
           <div
             key={s}
-            className={`h-1.5 flex-1 rounded-full ${
-              step === s || (['email', 'otp', 'password'] as const).indexOf(step) > i
-                ? 'bg-primary'
-                : 'bg-primary-100'
-            }`}
+            className={`h-1.5 flex-1 rounded-full ${step === s || (['email', 'otp', 'password'] as const).indexOf(step) > i
+              ? 'bg-primary'
+              : 'bg-primary-100'
+              }`}
           />
         ))}
       </div>

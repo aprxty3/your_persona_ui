@@ -2,13 +2,13 @@ import { ImageResponse } from 'next/og';
 import { EnvelopeSchema } from '@/core/domain/envelope';
 import { ResultSchema, gritBand } from '@/core/domain/assessment';
 
-// M4 — OG share image 9:16 (FR-D5). FE responsibility by design: reads result
+// OG share image 9:16. FE responsibility by design: reads result
 // data from the BE and renders a templated card — zero Gemini token cost.
 // This route runs server-side WITHOUT browser credentials → the BE treats it
-// as a non-owner link holder, which still gets the full data (FR-D8).
+// as a non-owner link holder, which still gets the full data.
 
 // Server-to-server (no browser, no cookies) — talks to the BE directly via
-// the same runtime var next.config.mjs's rewrite uses (FE-03), not the
+// the same runtime var next.config.mjs's rewrite uses, not the
 // browser-facing NEXT_PUBLIC_API_BASE_URL proxy path.
 const BASE_URL = process.env.API_INTERNAL_URL ?? 'http://localhost:8080';
 

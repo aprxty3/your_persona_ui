@@ -10,9 +10,6 @@ import { Card } from '@/components/ui/Card';
 import { GritTrendChart } from './GritTrendChart';
 import { HistoryList } from './HistoryList';
 
-// M5 — Member dashboard (Epic F): derived quota (FR-F2), GRIT trend (FR-F3),
-// micro-insights (FR-F4, locale-aware strings from the BE — render AS-IS),
-// history + PDF (FR-F5).
 
 export function DashboardView() {
   const t = useTranslations('dashboard');
@@ -63,7 +60,7 @@ export function DashboardView() {
         </div>
       </header>
 
-      {/* Quota (FR-F2, derived on the BE — never a stored counter) */}
+      {/* Quota, derived on the BE — never a stored counter) */}
       <Card tint="primary">
         <div className="flex items-center justify-between">
           <h2 className="font-extrabold text-slate-800">{t('quota.title')}</h2>
@@ -83,7 +80,7 @@ export function DashboardView() {
         )}
       </Card>
 
-      {/* GRIT trend (FR-F3) */}
+      {/* GRIT trend*/}
       <Card>
         <h2 className="font-extrabold text-slate-800">{t('trend.title')}</h2>
         <div className="mt-3">
@@ -91,7 +88,7 @@ export function DashboardView() {
         </div>
       </Card>
 
-      {/* Micro-insights (FR-F4): [] = hide the section, never a placeholder */}
+      {/* Micro-insights [] = hide the section, never a placeholder */}
       {data.micro_insights.length > 0 && (
         <Card tint="secondary">
           <h2 className="font-extrabold text-slate-800">{t('insights.title')}</h2>
@@ -107,7 +104,7 @@ export function DashboardView() {
         </Card>
       )}
 
-      {/* History (FR-F5) */}
+      {/* History*/}
       <section>
         <h2 className="mb-3 font-extrabold text-slate-800">{t('history.title')}</h2>
         <HistoryList />

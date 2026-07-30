@@ -5,7 +5,7 @@ import { Link } from '@/i18n/routing';
 import { LandingAnalytics } from '@/components/features/LandingAnalytics';
 import { LocaleSwitcher } from '@/components/features/LocaleSwitcher';
 
-// Landing page — fully SSR for SEO (FR-A1–A4, Epic J). All copy comes from
+// Landing page — fully SSR for SEO . All copy comes from
 // the next-intl dictionary; decoration is pure CSS to keep LCP light.
 
 // Hero mascots — deliberately 4 contrasting types (analyst/diplomat/explorer)
@@ -43,7 +43,7 @@ export default async function LandingPage({
 
   return (
     <div className="overflow-x-clip">
-      {/* FR-J2 — JSON-LD */}
+      {/*  JSON-LD */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

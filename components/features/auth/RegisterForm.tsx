@@ -15,10 +15,6 @@ import { LocaleSchema } from '@/core/domain/guestSession';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 
-// M5 — register (FR-H1). display_name/age/status are NOT asked here: with a
-// live guest session cookie the BE copies them from GUEST_SESSION (the claim
-// flow); without one, they're filled later via PATCH /account/profile.
-// referral_code comes silently from localStorage (?ref= capture at landing).
 
 export function RegisterForm() {
   const t = useTranslations('auth.register');
@@ -74,7 +70,7 @@ export function RegisterForm() {
             err instanceof ApiError &&
             err.code === 'TURNSTILE_VERIFICATION_FAILED'
           ) {
-            turnstileRef.current?.reset(); // §5.3 — input is KEPT
+            turnstileRef.current?.reset(); // input is KEPT
             setTurnstileToken(null);
           }
         },

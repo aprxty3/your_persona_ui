@@ -12,16 +12,6 @@ services:
     ports:
       - "127.0.0.1:3000:3000"
     environment:
-      # FE-03: next.config.mjs's rewrite proxy target, read at container start
-      # (not baked into the image — verified empirically, see FE-03 PR notes).
-      # `api` (controller-api's prod container) is NOT on the `shared` network
-      # this service joins, so this goes out through the public domain + the
-      # already-live Caddy/ACME cert instead of a direct container-to-container
-      # call. That's a functional no-op vs. the pre-FE-03 behavior (the OG
-      # route already called this same public URL) — it can be optimized later
-      # by also joining controller-api's `api` service to `your-persona-shared`
-      # (a controller-api-repo change, mirroring how api-staging already does
-      # this), which isn't done here to avoid touching the live prod BE stack.
       - API_INTERNAL_URL=https://your-personas.duckdns.org
     networks:
       - shared

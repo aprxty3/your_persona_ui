@@ -3,9 +3,9 @@ import { NextResponse } from 'next/server';
 import createMiddleware from 'next-intl/middleware';
 import { routing } from './i18n/routing';
 
-// Locale negotiation (EN default + ID) + the /dashboard UX gate (Tech Doc
-// §5.2): refresh_token lives in localStorage, so the server can't see login
-// state — the non-httpOnly `yp_session` flag (set/cleared by session.ts) only
+// Locale negotiation (EN default + ID) + the /dashboard UX gate
+// refresh_token lives in localStorage, so the server can't see login
+// state — the non-httpOnly `yp_session` flag (set/cleared by session.ts)
 // prevents a flash of protected content. REAL security stays in the API: no
 // valid token = 401 → interceptor → login redirect.
 
