@@ -5,6 +5,27 @@ Conventions: `[A]` Added · `[C]` Changed · `[F]` Fixed · `[D]` Deprecated · 
 
 ---
 
+## v0.2.1 — 2026-08-02
+
+### FE-04 & FE-05 complete: VPS deploy activation + production launch config
+
+#### [A] FE-04: FE now live on the VPS, both staging and production
+- 2 DuckDNS domains registered (`your-personas-app.duckdns.org` prod, `-stg` staging), both resolving to the VPS. `controller-api`'s shared Caddyfile gained 2 site blocks (`ui:3000` / `ui-staging:3000`) — TLS provisioning verified independently of the FE containers (502 until they existed, confirming Caddy + ACME worked).
+- GitHub Secrets (`VPS_HOST`, `VPS_USER`, `VPS_PORT`, `VPS_SSH_KEY` — reused from the same keypair as `controller-api`'s CI) and Variables (`FE_PROD_URL`, `FE_STAGING_URL`) set on this repo.
+- Full pipeline verified end-to-end on both paths: push `develop` → `deploy-staging` (auto) → smoke test 200; PR merge to `main` → `deploy` (production-environment approval gate) → approve → smoke test 200. Both `https://your-personas-app.duckdns.org` and the `-stg` staging domain confirmed serving the live app.
+
+#### [A] FE-05: production launch config — real Turnstile sitekey + PostHog
+- `NEXT_PUBLIC_TURNSTILE_SITE_KEY` (real Cloudflare sitekey, replacing the always-passing test key `1x00000000000000000000AA`) and `NEXT_PUBLIC_POSTHOG_KEY`/`NEXT_PUBLIC_POSTHOG_HOST` set as GitHub Variables and confirmed baked into the deployed prod/staging JS bundles (grepped the actual `_next/static/chunks/*.js` served in production to verify — not just "the variable is set," the compiled bundle actually contains it).
+- Reminder for future changes to any `NEXT_PUBLIC_*` value: these are Docker **build-args**, inlined into the JS bundle at `next build` time on the CI runner — never read from a `.env` file on the VPS (the FE containers have no `env_file:` at all, unlike `controller-api`'s). Changing one always requires a full rebuild+redeploy (new commit, or a manual CI rerun of an existing workflow run), never a container restart.
+
+#### [F] `docker` CI job building `linux/amd64` (wasted) + emulating `linux/arm64` via QEMU (slow)
+- Same root cause and fix as `controller-api`: VPS is arm64-only (Ampere A1), so the `amd64` leg was dead weight and the `arm64` leg paid QEMU emulation overhead. Switched to GitHub's native `ubuntu-24.04-arm` runner, dropped `linux/amd64` + the QEMU setup step, target `linux/arm64` only. Observed `docker` job time dropped from ~15min31s to ~1-2min.
+
+#### [A] Automated versioning/tagging via `release-please`
+- New `release-please-config.json` (`release-type: node` — bumps `package.json`'s `version`; `skip-changelog: true`, this file stays hand-maintained; `include-component-in-tag: false` so tags stay `vX.Y.Z` — the first automated release defaulted to prefixing the package name, `your_persona_ui-v0.2.0`, corrected immediately by deleting that tag/release and recreating as `v0.2.0`), `.release-please-manifest.json` (bootstrapped from `v0.1.0`), `.github/workflows/release-please.yml` (push to `main`).
+- Same operational gotcha as `controller-api`: release-please's PRs are authored by `GITHUB_TOKEN` and never trigger the required `pull_request` status checks, so they need `gh pr merge --admin` (content is always just a version-manifest bump, never application code). Requires `Allow GitHub Actions to create and approve pull requests` enabled in repo Settings → Actions.
+- Releases so far: `v0.2.0` (feature backlog from FE-03 through FE-15, matching the promotion of `develop` to `main`), `v0.2.1` (patch, the tag-format fix commit itself was Conventional-Commits `fix:`-typed and correctly triggered its own patch release).
+
 ## [UNRELEASED] — 2026-07-27
 
 ### GitHub issue triage (FE-02 through FE-15) — staging deployment focus
