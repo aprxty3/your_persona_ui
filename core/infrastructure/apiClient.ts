@@ -45,13 +45,7 @@ import {
   storeTokens,
 } from './session';
 
-// The single gateway to the BE (AGENTS.md): components are FORBIDDEN to fetch
-// directly — always hooks (core/application) → this apiClient. Centralized
-// responsibilities: envelope parsing, 401→refresh→retry interceptor,
-// X-CSRF-Token header, Idempotency-Key injection, credentials include
-// (session_id/csrf_token cookies).
-
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8080';
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? '/api/be';
 
 export class ApiError extends Error {
   constructor(
@@ -81,17 +75,10 @@ export class ApiError extends Error {
 type RequestOptions = {
   method?: 'GET' | 'POST' | 'PATCH' | 'DELETE';
   body?: unknown;
-  /** Extra per-call headers, e.g. Idempotency-Key on submit (§4.2). */
   headers?: Record<string, string>;
-  /**
-   * true for the auth endpoints themselves (login/refresh/logout) — a 401
-   * from them must NOT trigger a refresh loop.
-   */
   skipAuthRefresh?: boolean;
 };
 
-// Single-flight: many concurrent 401s → ONE refresh call, everyone awaits the
-// same promise (the "pause → refresh → resume" contract, §4.4).
 let refreshInFlight: Promise<void> | null = null;
 
 async function refreshSession(): Promise<void> {
@@ -122,8 +109,7 @@ async function request<S extends z.ZodTypeAny>(
   return data;
 }
 
-// Same pipeline, but also surfaces envelope.meta — needed for paginated
-// endpoints (history) where pagination lives in meta, not data (§4.3 envelope).
+// Same pipeline, but also surfaces envelope.meta — needed for paginated endpoints.
 async function requestWithMeta<S extends z.ZodTypeAny>(
   schema: S,
   path: string,
@@ -138,7 +124,7 @@ async function requestWithMeta<S extends z.ZodTypeAny>(
   const accessToken = getAccessToken();
   if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
 
-  // CSRF double-submit (§5.4): send on ALL non-GET — the BE only enforces it
+  // CSRF double-submit: send on ALL non-GET — the BE only enforces it
   // on 4 endpoints and ignores the rest; "always send" beats an FE allowlist.
   if (method !== 'GET') {
     const csrf = getCookie('csrf_token');
@@ -179,7 +165,7 @@ async function requestWithMeta<S extends z.ZodTypeAny>(
       | Record<string, unknown>
       | undefined;
 
-    // 401 interceptor (§4.4): hold → refresh → replay the same request.
+    // 401 interceptor: hold → refresh → replay the same request.
     // Guests are unaffected (no refresh token → the error is thrown as-is).
     if (
       res.status === 401 &&
@@ -210,7 +196,6 @@ async function requestWithMeta<S extends z.ZodTypeAny>(
 // ---------------------------------------------------------------------------
 
 export const api = {
-  // M2 — Guest onboarding. NOT Turnstile-gated (§5.3), NOT CSRF-enforced.
   createGuestSession(input: CreateGuestSessionRequest) {
     return request(CreateGuestSessionResponseSchema, '/v1/guest-session', {
       method: 'POST',
@@ -218,7 +203,6 @@ export const api = {
     });
   },
 
-  // M3 — question bank (also primes the csrf_token cookie before submit).
   getQuestions(locale: string) {
     return request(
       QuestionListSchema,
@@ -226,9 +210,6 @@ export const api = {
     );
   },
 
-  // M3 — submit. Idempotency-Key comes from the assessment store (§4.2);
-  // CSRF header is added automatically above. Gemini runs synchronously on the
-  // BE (Waiting Room UX) — the fetch simply stays in flight for 3-8s.
   submitAssessment(input: SubmitRequest, idempotencyKey: string) {
     return request(SubmitResponseSchema, '/v1/assessment/submit', {
       method: 'POST',
@@ -237,13 +218,10 @@ export const api = {
     });
   },
 
-  // M4 — result detail. Full response for ANY link holder (FR-D8); teaser/blur
-  // for non-owners is FE rendering driven by `is_owner`, not BE field cuts.
   getResult(resultId: string) {
     return request(ResultSchema, `/v1/results/${encodeURIComponent(resultId)}`);
   },
 
-  // M4 — mascot style persistence (FR-D11). Purely visual; owner-only on the BE.
   setMascotStyle(resultId: string, style: 'style_a' | 'style_b') {
     return request(
       z.record(z.string(), z.unknown()),
@@ -252,7 +230,6 @@ export const api = {
     );
   },
 
-  // M5 — auth.
   login(input: LoginRequest): Promise<TokenPair> {
     return request(TokenPairSchema, '/v1/auth/login', {
       method: 'POST',
@@ -262,8 +239,6 @@ export const api = {
   },
 
   register(input: RegisterRequest) {
-    // Sent WITH credentials: a live guest session_id cookie triggers the
-    // Guest→Member claim on the BE (onboarding data copy + result reassign).
     return request(RegisterResponseSchema, '/v1/auth/register', {
       method: 'POST',
       body: input,
@@ -315,7 +290,6 @@ export const api = {
     });
   },
 
-  // M5 — Member dashboard (Epic F).
   getDashboard() {
     return request(DashboardResponseSchema, '/v1/user-dashboard');
   },
@@ -338,14 +312,6 @@ export const api = {
     );
   },
 
-  /**
-   * PDF download (FR-E1–E4): the BE proxies/streams the PDF bytes directly
-   * (200, not a redirect to signed storage) — a cross-origin redirect would
-   * force the browser to send an opaque "null" Origin on the follow-up
-   * request per the Fetch spec, which R2's CORS policy can't allow-list.
-   * fetch() here is a plain same-flow request; window.open() still can't be
-   * used because members authenticate via the Authorization header.
-   */
   async downloadPdf(resultId: string): Promise<Blob> {
     const headers: Record<string, string> = {};
     const accessToken = getAccessToken();
@@ -360,8 +326,6 @@ export const api = {
     return res.blob();
   },
 
-  // M5 — Account & compliance (§5.5). CSRF is enforced by the BE on profile
-  // and delete-request(/cancel) — the header rides along automatically.
   updateProfile(input: UpdateProfileRequest) {
     return request(ProfileResponseSchema, '/v1/account/profile', {
       method: 'PATCH',
@@ -404,7 +368,7 @@ export const api = {
     clearSession();
   },
 
-  /** App/tab boot (§5.1): fill the access token from the persisted refresh_token. */
+  /** App/tab boot : fill the access token from the persisted refresh_token. */
   async bootstrapSession(): Promise<boolean> {
     if (!getRefreshToken()) return false;
     try {

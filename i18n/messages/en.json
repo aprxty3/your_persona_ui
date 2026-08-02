@@ -347,7 +347,9 @@
       "badge": "Shared result",
       "title": "Someone discovered their persona!",
       "desc": "Curious what yours looks like? The test is free and takes just a few minutes.",
-      "cta": "Find out my persona"
+      "cta": "Find out my persona",
+      "scoresTitle": "A sneak peek at their scores",
+      "dimmedLabel": "Locked"
     },
     "hero": {
       "youAre": "You are",

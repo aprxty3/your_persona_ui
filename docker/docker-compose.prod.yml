@@ -1,13 +1,3 @@
-# FE production stack — one Next.js (standalone, Bun) container.
-#
-# No public ports: the shared Caddy (controller-api stack) reaches `ui` over the
-# external `your-persona-shared` network and terminates TLS. Add to the BE
-# Caddyfile:   <fe-domain> { reverse_proxy ui:3000 }
-# 127.0.0.1:3000 is bound for on-VPS debugging only.
-#
-# NEXT_PUBLIC_* is baked into the image at CI build time (see .github/workflows/ci.yml)
-# — no runtime env/env_file needed here. UI_IMAGE_TAG is exported by the deploy job.
-
 name: your-persona-ui-prod
 
 networks:
@@ -21,5 +11,7 @@ services:
     restart: unless-stopped
     ports:
       - "127.0.0.1:3000:3000"
+    environment:
+      - API_INTERNAL_URL=https://your-personas.duckdns.org
     networks:
       - shared

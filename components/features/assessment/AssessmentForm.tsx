@@ -20,10 +20,6 @@ import {
 import { WaitingRoom } from './WaitingRoom';
 import { QuotaExceededPanel } from './QuotaExceededPanel';
 
-// M3 — the assessment engine (Epic B + C). Answers persist to localStorage via
-// the Zustand store (FR-B6): refresh mid-essay loses nothing. Back navigation
-// between sections is free — the BE upserts revised answers (FR-B10).
-
 const SECTIONS = ['A', 'B', 'C'] as const;
 
 export function AssessmentForm() {
@@ -151,7 +147,7 @@ export function AssessmentForm() {
     <div className="space-y-6">
       {submit.isPending && <WaitingRoom />}
 
-      {/* Progress (FR-B7): answered / total across the whole test */}
+      {/* Progress : answered / total across the whole test */}
       <div>
         <div className="mb-1.5 flex items-center justify-between text-xs font-bold">
           <span className="text-primary-700">

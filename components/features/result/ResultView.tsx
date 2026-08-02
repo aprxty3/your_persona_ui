@@ -15,9 +15,6 @@ import { gritBand, type Result } from '@/core/domain/assessment';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 
-// M4 — Grand Reveal (Epic D). The API returns the FULL result to any link
-// holder (FR-D8, UUID unguessable); teaser vs full is a RENDERING decision
-// driven by `is_owner` — never a field cut on the BE.
 
 const TRAIT_PAIRS = ['EI', 'SN', 'TF', 'JP'] as const;
 
@@ -42,7 +39,7 @@ export function ResultView({ resultId }: { resultId: string }) {
     );
   }
 
-  // Expired / unknown result (Guest TTL 14 days, FR-G5) — dedicated page state.
+  // Expired / unknown result (Guest TTL 14 days) — dedicated page state.
   if (error instanceof ApiError && error.status === 404) {
     return (
       <Card tint="primary" className="text-center">
@@ -51,7 +48,7 @@ export function ResultView({ resultId }: { resultId: string }) {
         <p className="mt-2 text-sm text-slate-600">{t('expired.desc')}</p>
         <Link
           href="/onboarding"
-          className="mt-5 inline-block rounded-2xl bg-primary px-6 py-3 font-bold text-white shadow-soft hover:bg-primary-600"
+          className="mt-5 inline-block rounded-2xl bg-primary px-6 py-3 font-bold text-white shadow-soft hover:bg-primary-700"
         >
           {t('expired.cta')}
         </Link>
@@ -75,11 +72,7 @@ export function ResultView({ resultId }: { resultId: string }) {
   );
 }
 
-// ---------------------------------------------------------------------------
 
-// FR-D-adjacent UX fix: landing here always follows a router.replace from the
-// assessment/claim flow (history entry doesn't stack), so the browser Back
-// button has nowhere sensible to go — this is the only way back in.
 function BackNav() {
   const t = useTranslations('results');
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -98,7 +91,6 @@ function BackNav() {
 
 function MascotImage({ result, size }: { result: Result; size: number }) {
   const t = useTranslations('results');
-  // Defensive (M0 #3): pre-scoring rows can have empty mbti_type — no broken img.
   if (!/^[EI][SN][TF][JP]$/.test(result.mbti_type)) return null;
   const style = result.mascot_style === 'style_b' ? 'style_b' : 'style_a';
   return (
@@ -122,8 +114,7 @@ function MascotImage({ result, size }: { result: Result; size: number }) {
 function TraitBars({ result }: { result: Result }) {
   const t = useTranslations('results');
   const scores = result.trait_scores;
-  // Defensive: old zero-value data (all four pair keys 0/absent) → hide section
-  // instead of rendering "100% second pole" lies.
+  // old zero-value data (all four pair keys 0/absent) → hide section
   if (!scores || TRAIT_PAIRS.every((k) => !scores[k])) return null;
 
   return (
@@ -165,7 +156,7 @@ function ShareButton({ resultId }: { resultId: string }) {
 
   const onShare = async () => {
     track('share_clicked');
-    // Share URL = /results/[id] ONLY — the contract has no share_token (§6.3).
+    // Share URL = /results/[id] ONLY.
     const url = `${window.location.origin}/results/${resultId}`;
     if (navigator.share) {
       await navigator.share({ url }).catch(() => undefined);
@@ -235,7 +226,7 @@ function FullResult({ result }: { result: Result }) {
           {result.mbti_type || '????'}
         </motion.h1>
 
-        {/* Mascot style switcher (FR-D11) — neutral labels, persisted via PATCH */}
+        {/* Mascot style switcher — neutral labels, persisted via PATCH */}
         <div
           role="group"
           aria-label={t('mascot.styleLabel')}
@@ -246,11 +237,10 @@ function FullResult({ result }: { result: Result }) {
               key={s}
               type="button"
               onClick={() => setStyle.mutate(s)}
-              className={`rounded-xl px-4 py-1.5 text-xs font-bold transition-colors ${
-                result.mascot_style === s
-                  ? 'bg-primary text-white'
-                  : 'text-slate-500 hover:bg-primary-50'
-              }`}
+              className={`rounded-xl px-4 py-1.5 text-xs font-bold transition-colors ${result.mascot_style === s
+                ? 'bg-primary text-white'
+                : 'text-slate-500 hover:bg-primary-50'
+                }`}
             >
               {s === 'style_a' ? t('mascot.styleA') : t('mascot.styleB')}
             </button>
@@ -258,7 +248,7 @@ function FullResult({ result }: { result: Result }) {
         </div>
       </div>
 
-      {/* Wellbeing safety net (FR-B11) — ALONGSIDE the result, never replacing it */}
+      {/* Wellbeing safety net - ALONGSIDE the result, never replacing it */}
       {result.wellbeing_flag && (
         <Card tint="secondary" role="note">
           <h2 className="font-bold text-slate-800">{t('wellbeing.title')}</h2>
@@ -274,7 +264,7 @@ function FullResult({ result }: { result: Result }) {
         </Card>
       )}
 
-      {/* GRIT — score ALWAYS with its qualitative label (PRD Section 3a) */}
+      {/* GRIT — score ALWAYS with its qualitative label*/}
       <Card tint="primary">
         <div className="flex items-center justify-between">
           <h2 className="font-extrabold text-slate-800">{t('grit.title')}</h2>
@@ -318,8 +308,7 @@ function FullResult({ result }: { result: Result }) {
   );
 }
 
-// PDF is a member-only perk (FR-E1) — guests get the Claim Banner instead,
-// which is the actual path to unlocking a PDF at all.
+// PDF is a member-only perk — guests get the Claim Banner instead.
 function PdfDownloadButton({ resultId }: { resultId: string }) {
   const t = useTranslations('results');
   const download = useDownloadPdf();
@@ -356,6 +345,58 @@ function PdfDownloadButton({ resultId }: { resultId: string }) {
 
 // ---------------------------------------------------------------------------
 
+function TeaserScorePreview({ result }: { result: Result }) {
+  const t = useTranslations('results');
+  const scores = result.trait_scores;
+  // Same defensive guard as TraitBars — pre-scoring zero-value rows hide this.
+  if (!scores || TRAIT_PAIRS.every((k) => !scores[k])) return null;
+
+  return (
+    <Card className="text-left">
+      <h2 className="font-extrabold text-slate-800">{t('teaser.scoresTitle')}</h2>
+      <div className="mt-4 space-y-4">
+        <div className="relative overflow-hidden rounded-lg">
+          <div aria-hidden className="select-none blur-sm">
+            <div className="mb-1 flex justify-between text-xs font-bold text-slate-600">
+              <span>{t('grit.title')}</span>
+              <span>{result.grit_score}%</span>
+            </div>
+            <div className="h-3 overflow-hidden rounded-full bg-primary-100">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-secondary-500 to-primary"
+                style={{ width: `${result.grit_score}%` }}
+              />
+            </div>
+          </div>
+          <div className="absolute inset-0 flex items-center justify-center bg-white/60">
+            <span className="text-[11px] font-bold text-accent-700">
+              🔒 {t('teaser.dimmedLabel')}
+            </span>
+          </div>
+        </div>
+
+        {TRAIT_PAIRS.map((pair) => {
+          const value = scores[pair] ?? 50;
+          return (
+            <div key={pair}>
+              <div className="mb-1 flex justify-between text-xs font-bold text-slate-600">
+                <span>{t(`traits.${pair}.first`)}</span>
+                <span>{t(`traits.${pair}.second`)}</span>
+              </div>
+              <div className="h-3 overflow-hidden rounded-full bg-primary-100">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-primary to-secondary-500"
+                  style={{ width: `${value}%` }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </Card>
+  );
+}
+
 function TeaserResult({ result }: { result: Result }) {
   const t = useTranslations('results');
 
@@ -374,7 +415,9 @@ function TeaserResult({ result }: { result: Result }) {
         </h1>
       </div>
 
-      {/* Blur = pure FE rendering (FR-D3/D4); the data is intentionally there */}
+      <TeaserScorePreview result={result} />
+
+      {/* Blur = pure FE rendering; the data is intentionally there */}
       <Card className="relative overflow-hidden text-left">
         <div aria-hidden className="select-none blur-md">
           <h2 className="font-extrabold text-slate-800">{t('summary.title')}</h2>

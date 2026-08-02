@@ -4,9 +4,12 @@ const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Docker image target <150MB — the runtime only needs .next/standalone (AGENTS.md Commands).
   output: 'standalone',
   reactStrictMode: true,
+  async rewrites() {
+    const target = process.env.API_INTERNAL_URL ?? 'http://localhost:8080';
+    return [{ source: '/api/be/:path*', destination: `${target}/:path*` }];
+  },
 };
 
 export default withNextIntl(nextConfig);

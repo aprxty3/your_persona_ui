@@ -4,8 +4,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, ApiError } from '@/core/infrastructure/apiClient';
 import type { Result } from '@/core/domain/assessment';
 
-// M4 — result detail + mascot style persistence.
-
 export function useResult(resultId: string) {
   return useQuery<Result, Error>({
     queryKey: ['result', resultId],

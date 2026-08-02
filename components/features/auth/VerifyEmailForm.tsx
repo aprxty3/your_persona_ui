@@ -9,8 +9,6 @@ import { ApiError } from '@/core/infrastructure/apiClient';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 
-// M5 — verify email OTP (FR-H2). Success = auto-login (tokens come straight
-// back) → dashboard. Resend has a 60s/email cooldown mirrored client-side.
 
 const RESEND_COOLDOWN_S = 60;
 

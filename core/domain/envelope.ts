@@ -17,8 +17,8 @@ export const EnvelopeSchema = z.object({
 export type Envelope = z.infer<typeof EnvelopeSchema>;
 export type ErrorDetail = z.infer<typeof ErrorDetailSchema>;
 
-// Error codes the FE maps (Tech Doc §9). Codes outside this list are still
-// accepted as plain strings — never crash just because the BE added a new code.
+// Error codes the FE maps. Codes outside this list are still
+// accepted as plain strings.
 export const KnownErrorCode = z.enum([
   'VALIDATION_ERROR',
   'UNAUTHORIZED',

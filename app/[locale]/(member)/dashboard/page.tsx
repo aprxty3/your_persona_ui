@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { DashboardView } from '@/components/features/dashboard/DashboardView';
 
-// M5 — Member dashboard (= USER dashboard, Epic F — NOT an admin dashboard).
+// Member dashboard (= USER dashboard, NOT an admin dashboard).
 // The middleware yp_session gate is UX only; real security is the API's 401.
 export default async function DashboardPage({
   params,

@@ -15,7 +15,7 @@ export function getRefreshToken(): string | null {
 export function storeTokens(access: string, refresh: string): void {
   accessToken = access;
   window.localStorage.setItem(REFRESH_TOKEN_KEY, refresh);
-  // Pure UX flag for the /dashboard middleware (Tech Doc §5.2) — NOT a credential.
+  // Pure UX flag for the /dashboard middleware — NOT a credential.
   document.cookie = `${SESSION_FLAG_COOKIE}=1; path=/; max-age=${14 * 24 * 3600}; samesite=lax`;
 }
 

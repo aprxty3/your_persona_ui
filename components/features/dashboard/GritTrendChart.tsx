@@ -4,10 +4,6 @@ import { useTranslations } from 'next-intl';
 import type { GritTrendPoint } from '@/core/domain/dashboard';
 import { gritBand } from '@/core/domain/assessment';
 
-// FR-F3 — GRIT trend. Hand-rolled SVG line chart: one small graph doesn't
-// justify a chart library (Tech Doc §2). Defensive: pre-scoring rows carry
-// grit_score 0 — they're plotted but flagged, and <2 points = no line.
-
 const W = 320;
 const H = 120;
 const PAD = 16;

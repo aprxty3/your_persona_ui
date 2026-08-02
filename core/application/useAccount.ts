@@ -4,7 +4,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/core/infrastructure/apiClient';
 import type { UpdateProfileRequest } from '@/core/domain/account';
 
-// M5 — settings: profile (FR-I3), referral (FR-G1), deletion (FR-G2/G2a).
 
 export function useUpdateProfile() {
   const queryClient = useQueryClient();
@@ -12,7 +11,6 @@ export function useUpdateProfile() {
   return useMutation({
     mutationFn: (input: UpdateProfileRequest) => api.updateProfile(input),
     onSuccess: () => {
-      // Locale/profile changes affect dashboard content (micro_insights locale).
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
     },
   });

@@ -4,11 +4,6 @@ import { useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/core/infrastructure/apiClient';
 
-// §4.3 — PDF status polling (FR-E4/E5), copied VERBATIM from the Tech Doc
-// contract: backoff 2s→4s→8s cap 10s using dataUpdateCount (successful fetch
-// count — NOT fetchFailureCount), hard 90s total deadline, `failed` = stop
-// immediately. A 401 mid-poll is held/refresh/replayed by the apiClient, so
-// the cycle resumes at the same step with no extra logic here.
 
 export function usePdfStatus(resultId: string, enabled = true) {
   const startedAt = useRef(Date.now());

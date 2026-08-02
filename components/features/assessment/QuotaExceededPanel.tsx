@@ -7,7 +7,7 @@ import { track } from '@/core/infrastructure/analytics';
 import { useAuthStore } from '@/core/application/stores/authStore';
 import { Card } from '@/components/ui/Card';
 
-// FR-D10: 429 QUOTA_EXCEEDED gets a dedicated panel with a register CTA —
+// 429 QUOTA_EXCEEDED gets a dedicated panel with a register CTA —
 // NEVER a generic error toast. Guest copy sells the upgrade (1 → 3 tests/month).
 
 export function QuotaExceededPanel() {

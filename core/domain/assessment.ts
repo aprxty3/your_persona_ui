@@ -73,7 +73,7 @@ export const ResultSchema = z.object({
   grit_score: z.number().int(),
   // 5 uppercase keys {EI,SN,TF,JP,GRIT}, values 0-100 = percent leaning to the
   // first pole (E/S/T/J). Optional + defensive: old pre-scoring results can be
-  // empty/zero-value (M0 checklist #3).
+  // empty/zero-value.
   trait_scores: z.record(z.string(), z.number()).nullish(),
   ai_summary_text: z.string(),
   status: z.string(),

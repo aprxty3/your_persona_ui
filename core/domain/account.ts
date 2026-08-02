@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { GuestStatusSchema, LocaleSchema } from './guestSession';
 
-// M5 — Account, Referral & Compliance (Tech Doc §5.5).
 
 // PATCH /v1/account/profile — partial update: send only what changed.
 export const UpdateProfileRequestSchema = z.object({

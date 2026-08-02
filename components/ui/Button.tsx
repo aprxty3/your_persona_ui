@@ -16,8 +16,7 @@ const base =
 
 const variants: Record<Variant, string> = {
   primary:
-    'bg-primary text-white shadow-soft hover:bg-primary-600 hover:shadow-pop',
-  // accent is ONLY for the most important CTAs — don't sprinkle it everywhere (§6.1).
+    'bg-primary text-white shadow-soft hover:bg-primary-700 hover:shadow-pop',
   accent:
     'bg-accent text-white shadow-pop hover:bg-accent-700',
   outline:

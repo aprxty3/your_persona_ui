@@ -5,7 +5,7 @@ import { Link } from '@/i18n/routing';
 import { LandingAnalytics } from '@/components/features/LandingAnalytics';
 import { LocaleSwitcher } from '@/components/features/LocaleSwitcher';
 
-// Landing page — fully SSR for SEO (FR-A1–A4, Epic J). All copy comes from
+// Landing page — fully SSR for SEO . All copy comes from
 // the next-intl dictionary; decoration is pure CSS to keep LCP light.
 
 // Hero mascots — deliberately 4 contrasting types (analyst/diplomat/explorer)
@@ -43,7 +43,7 @@ export default async function LandingPage({
 
   return (
     <div className="overflow-x-clip">
-      {/* FR-J2 — JSON-LD */}
+      {/*  JSON-LD */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -205,7 +205,11 @@ export default async function LandingPage({
 
       {/* ---------- Final CTA ---------- */}
       <section className="mx-auto max-w-6xl px-4 pb-20">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-secondary-500 to-accent p-10 text-center text-white sm:p-16">
+        {/* via-secondary-700 not -500 (FE-06): the h2/p below sit directly on
+            this gradient in white text — secondary-500 vs white measures only
+            2.49:1, failing WCAG AA even at the relaxed large-text 3:1 floor;
+            secondary-700 measures 5.47:1. */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-secondary-700 to-accent p-10 text-center text-white sm:p-16">
           <div aria-hidden className="absolute -right-10 -top-10 h-48 w-48 animate-blob rounded-full bg-white/10" />
           <div aria-hidden className="absolute -bottom-14 -left-10 h-56 w-56 animate-blob rounded-full bg-white/10" />
           <h2 className="text-3xl font-extrabold sm:text-4xl">{t('finalCta.title')}</h2>

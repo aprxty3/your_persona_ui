@@ -4,9 +4,6 @@ import { useTranslations } from 'next-intl';
 import { parseOptions, optionLetter, type Question } from '@/core/domain/assessment';
 import { Card } from '@/components/ui/Card';
 
-// M3 — one renderer per question type (FR-B1–B4). Values follow the BE
-// scoring contract exactly: SJT = option LETTER ("A".."E"), Likert = "1".."5"
-// (string), essay = raw text. Option labels are locale-aware from the BE.
 
 type InputProps = {
   question: Question;
@@ -32,11 +29,10 @@ export function SjtCard({ question, value, onChange, index }: InputProps) {
           return (
             <label
               key={letter}
-              className={`flex cursor-pointer items-start gap-3 rounded-2xl border-2 px-4 py-3 text-sm font-medium transition-colors ${
-                selected
+              className={`flex cursor-pointer items-start gap-3 rounded-2xl border-2 px-4 py-3 text-sm font-medium transition-colors ${selected
                   ? 'border-primary bg-primary-50 text-primary-700'
                   : 'border-primary-100 bg-white text-slate-600 hover:border-primary-300'
-              }`}
+                }`}
             >
               <input
                 type="radio"
@@ -48,9 +44,8 @@ export function SjtCard({ question, value, onChange, index }: InputProps) {
               />
               <span
                 aria-hidden
-                className={`mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
-                  selected ? 'bg-primary text-white' : 'bg-primary-100 text-primary-700'
-                }`}
+                className={`mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold ${selected ? 'bg-primary text-white' : 'bg-primary-100 text-primary-700'
+                  }`}
               >
                 {letter}
               </span>
@@ -84,11 +79,10 @@ export function LikertCard({ question, value, onChange, index }: InputProps) {
           return (
             <label
               key={n}
-              className={`flex cursor-pointer flex-col items-center gap-1 rounded-2xl border-2 px-1 py-2.5 transition-colors ${
-                selected
+              className={`flex cursor-pointer flex-col items-center gap-1 rounded-2xl border-2 px-1 py-2.5 transition-colors ${selected
                   ? 'border-secondary bg-secondary-100/60'
                   : 'border-primary-100 bg-white hover:border-secondary-300'
-              }`}
+                }`}
             >
               <input
                 type="radio"
@@ -100,9 +94,8 @@ export function LikertCard({ question, value, onChange, index }: InputProps) {
               />
               <span
                 aria-hidden
-                className={`inline-flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
-                  selected ? 'bg-secondary-500 text-white' : 'bg-primary-50 text-slate-500'
-                }`}
+                className={`inline-flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${selected ? 'bg-secondary-500 text-white' : 'bg-primary-50 text-slate-500'
+                  }`}
               >
                 {n}
               </span>
@@ -117,7 +110,7 @@ export function LikertCard({ question, value, onChange, index }: InputProps) {
   );
 }
 
-// Encouraging counter thresholds (FR-B3/B4): copy never scolds — targets
+// Encouraging counter thresholds: copy never scolds — targets
 // drop-off ≤35% in Section C. The BE's garbage filter kicks in below 30 chars;
 // the client mirrors that as a soft minimum (server stays authoritative).
 export const ESSAY_MIN_CHARS = 30;

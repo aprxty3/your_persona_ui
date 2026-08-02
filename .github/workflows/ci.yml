@@ -1,17 +1,3 @@
-# CI/CD — mirrors the controller-api pipeline shape:
-#   push develop  -> checks -> docker build+push (staging build-args) -> auto-deploy staging
-#   push main     -> checks -> docker build+push (production build-args) -> deploy production
-#                    (gated by the `production` environment's required-reviewer rule)
-#   pull_request  -> checks + docker build only (never pushed)
-#
-# NEXT_PUBLIC_* values are inlined into the bundle AT BUILD TIME (see Dockerfile),
-# so the staging and production images are built with different build-args and are
-# NOT interchangeable — each deploy job consumes the sha tag from its own branch run.
-#
-# Deploy jobs are safe no-ops until the VPS secrets are configured
-# (VPS_SSH_KEY/VPS_HOST/VPS_USER) and the FE stack exists on the VPS —
-# see the "[ops] FE VPS deploy runbook" issue for the full setup checklist.
-
 name: CI
 
 on:
@@ -64,15 +50,7 @@ jobs:
           bun-version: latest
       - run: bun install --frozen-lockfile
       - name: bun test
-        # Guarded: `bun test` exits non-zero when zero test files exist, which would
-        # permanently red-flag the pipeline before the first test is written.
-        # Remove the guard once the apiClient unit tests land (tracked in issues).
-        run: |
-          if find . -path ./node_modules -prune -o -type f \( -name '*.test.ts' -o -name '*.test.tsx' \) -print | grep -q .; then
-            bun test
-          else
-            echo "::notice::No test files yet — skipping. Write apiClient envelope/refresh tests to close M1 DoD."
-          fi
+        run: bun test
 
   build:
     runs-on: ubuntu-latest
@@ -87,7 +65,11 @@ jobs:
         run: bun run build
 
   docker:
-    runs-on: ubuntu-latest
+    # Native arm64 runner: the VPS (Ampere A1) is arm64-only, so we build
+    # natively for linux/arm64 instead of cross-compiling via QEMU on an
+    # amd64 runner. Avoids emulation overhead and skips a linux/amd64
+    # image that would never actually be pulled/run anywhere.
+    runs-on: ubuntu-24.04-arm
     needs: [test, build, secrets]
     permissions:
       contents: read
@@ -95,13 +77,6 @@ jobs:
     outputs:
       image_sha_tag: sha-${{ github.sha }}
     env:
-      # Build-args are branch-dependent because NEXT_PUBLIC_* is inlined at build time.
-      # Repo Variables (Settings > Secrets and variables > Actions > Variables) override
-      # the defaults; Turnstile falls back to Cloudflare's always-pass TEST sitekey so
-      # staging works out of the box — set NEXT_PUBLIC_TURNSTILE_SITE_KEY before real launch.
-      API_BASE_URL: ${{ github.ref == 'refs/heads/main'
-        && (vars.NEXT_PUBLIC_API_BASE_URL_PROD || 'https://your-personas.duckdns.org')
-        || (vars.NEXT_PUBLIC_API_BASE_URL_STG || 'https://your-personas-stg.duckdns.org') }}
       TURNSTILE_SITE_KEY: ${{ github.ref == 'refs/heads/main'
         && (vars.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '1x00000000000000000000AA')
         || '1x00000000000000000000AA' }}
@@ -128,8 +103,6 @@ jobs:
             type=sha,prefix=sha-,format=long
             type=raw,value=latest,enable={{is_default_branch}}
             type=ref,event=branch
-      - name: Set up QEMU (emulation for non-native target platforms)
-        uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
       - name: Build image (push only on branch pushes, never on PRs)
@@ -137,12 +110,11 @@ jobs:
         with:
           context: .
           file: Dockerfile
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/arm64
           push: ${{ github.event_name == 'push' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            NEXT_PUBLIC_API_BASE_URL=${{ env.API_BASE_URL }}
             NEXT_PUBLIC_TURNSTILE_SITE_KEY=${{ env.TURNSTILE_SITE_KEY }}
             NEXT_PUBLIC_POSTHOG_KEY=${{ env.POSTHOG_KEY }}
             NEXT_PUBLIC_POSTHOG_HOST=${{ env.POSTHOG_HOST }}
@@ -159,7 +131,6 @@ jobs:
       cancel-in-progress: false
     env:
       VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
-      # Set once the FE production DuckDNS name is registered (see ops runbook issue).
       SMOKE_URL: ${{ vars.FE_PROD_URL || '' }}
     steps:
       - name: SSH deploy — pull & recreate

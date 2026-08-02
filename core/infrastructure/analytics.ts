@@ -1,8 +1,5 @@
 import posthog from 'posthog-js';
 
-// PRD Section 3 metric instrumentation — mandatory since M1 (Tech Doc §8).
-// HARD RULE: no PII, no essay content — event names + technical properties only.
-
 export type AnalyticsEvent =
   | 'landing_view'
   | 'onboarding_started'

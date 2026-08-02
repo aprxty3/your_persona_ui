@@ -13,8 +13,6 @@ import type {
 } from '@/core/domain/auth';
 import { useAuthStore } from './stores/authStore';
 
-// M5 — auth mutations. Shared pattern: mutation → apiClient → token pair into
-// authStore (access in-memory, refresh localStorage).
 
 export function useLogin() {
   const setSession = useAuthStore((s) => s.setSession);
@@ -41,7 +39,6 @@ export function useRegister() {
       return api.register(payload);
     },
     onSuccess: (_res, input) => {
-      // Funnel metric (§8): Guest→Member conversion via the claim banner.
       if (input.fromClaim) track('register_from_claim');
     },
   });
