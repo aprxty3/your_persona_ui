@@ -128,11 +128,15 @@ Two long-lived branches, both protected (PR + required checks):
 | `develop` | checks → image build+push (staging Turnstile/PostHog build-args) | **auto-deploy staging** |
 | `main` | checks → image build+push (production Turnstile/PostHog build-args) | **production, gated by approval** (GitHub environment `production`) |
 
-Checks: `secrets` (gitleaks) → `lint` / `typecheck` → `test` / `build` → `docker` (multi-arch `linux/amd64,linux/arm64` image pushed to GHCR as `ghcr.io/aprxty3/your_persona_ui:sha-<sha>`).
+Checks: `secrets` (gitleaks) → `lint` / `typecheck` → `test` / `build` → `docker` (`linux/arm64` image built natively on a `ubuntu-24.04-arm` runner, pushed to GHCR as `ghcr.io/aprxty3/your_persona_ui:sha-<sha>`). `linux/amd64` was dropped 2026-08-02 — the VPS is an Ampere A1 (arm64-only), so that image was never pulled by anything, and building arm64 under QEMU emulation on an amd64 runner took ~15 minutes versus ~1-2 natively.
 
 **Important:** `NEXT_PUBLIC_*` values are inlined **at build time**. Since FE-03, `NEXT_PUBLIC_API_BASE_URL` is a constant (`/api/be`, same in every environment) — the only build-time value still branch-dependent is `NEXT_PUBLIC_TURNSTILE_SITE_KEY` (plus PostHog), so staging and production images differ only in that. The actual BE address (`API_INTERNAL_URL`) is a runtime env var set per docker-compose file, not a build-arg.
 
-Deploy jobs are safe no-ops until the VPS secrets exist. Activation checklist (DuckDNS names, Caddyfile entries, VPS checkout dirs, Actions secrets `VPS_SSH_KEY`/`VPS_HOST`/`VPS_USER` + variables `FE_PROD_URL`/`FE_STAGING_URL`/`NEXT_PUBLIC_TURNSTILE_SITE_KEY`/`NEXT_PUBLIC_POSTHOG_KEY`): **issue FE-04**. Until the real Turnstile sitekey variable is set, production builds fall back to Cloudflare's always-pass test key — see **issue FE-05** before launch.
+**Live since 2026-08-02** (issues FE-04 and FE-05, both closed) — <https://your-personas-app.duckdns.org> (production) and <https://your-personas-app-stg.duckdns.org> (staging), both served by the shared Caddy instance owned by the `controller-api` stack. Actions secrets (`VPS_SSH_KEY`/`VPS_HOST`/`VPS_USER`/`VPS_PORT`) and variables (`FE_PROD_URL`/`FE_STAGING_URL`/`NEXT_PUBLIC_TURNSTILE_SITE_KEY`/`NEXT_PUBLIC_POSTHOG_KEY`/`NEXT_PUBLIC_POSTHOG_HOST`) are all set; the real Cloudflare Turnstile sitekey replaced the always-pass test key and is verified present in the deployed bundle. Rebuild-from-zero steps: [`docs/deploy_runbook.md`](./docs/deploy_runbook.md).
+
+**Versioning:** automated via [`release-please`](https://github.com/googleapis/release-please) (`.github/workflows/release-please.yml`). Pushing to `main` opens a release PR that bumps `package.json`'s version; merging it creates the git tag + GitHub Release. The bump comes from Conventional Commits read off the **merge-commit title (= PR title)** — so a promotion PR must be titled `feat:`/`fix:`, never `release:`/`chore:` (not "user facing", release gets skipped silently). `CHANGELOG.md` stays hand-maintained (`skip-changelog: true`), and `include-component-in-tag: false` keeps tags as `vX.Y.Z` rather than `your_persona_ui-vX.Y.Z`.
+
+**Branch sync rule:** after every `develop`→`main` promotion, back-merge `main`→`develop`. `develop` being ahead of `main` is normal; `main` being ahead of `develop` must always be zero, otherwise the next promotion silently reverts whatever only `main` had. Quick check: `git log origin/develop..origin/main --oneline` should be empty.
 
 ```bash
 docker build -f Dockerfile .   # local image build
