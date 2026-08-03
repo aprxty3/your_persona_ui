@@ -4,6 +4,10 @@ This is a runbook, not an essay — follow it top to bottom for a fresh deploy. 
 
 Scope note: this FE has no database, no migrations, and no persisted runtime secrets — `NEXT_PUBLIC_TURNSTILE_SITE_KEY`/`NEXT_PUBLIC_POSTHOG_*` are baked into the Docker image **at build time** (see `.github/workflows/ci.yml`'s `docker` job), but `NEXT_PUBLIC_API_BASE_URL` is now a constant (`/api/be`) and the real BE address (`API_INTERNAL_URL`) is a plain runtime env var set per docker-compose file (FE-03) — nothing to seed, migrate, or back up here.
 
+> **Status: already deployed (2026-08-02).** Production <https://your-personas-app.duckdns.org> and staging <https://your-personas-app-stg.duckdns.org> are live, and the full pipeline has been exercised end-to-end in both directions (push `develop` → auto staging deploy; merge to `main` → approval-gated production deploy). Everything under "Prerequisites" below is **already done** — it is kept as rebuild-from-zero instructions, not a pending checklist. Issues FE-04 and FE-05 are closed. As-built detail: `psyche-assessment-docs/DEPLOYMENT-PROGRESS-FE.md` Section 8.
+>
+> **Caddy config changes need a manual restart.** The Caddyfile lives in the `controller-api` repo and is bind-mounted read-only into the Caddy container. `docker compose up -d` does **not** reload it when the file on disk changes — after editing it you must `docker compose -f docker/docker-compose.prod.yml restart caddy` on the VM. This is not automated by either repo's CI.
+
 ## Prerequisites (do these once, before touching the VM)
 
 1. **Domain topology (FE-03) — already decided, nothing to do here.** `next.config.mjs` proxies `/api/be/*` to `API_INTERNAL_URL` so `session_id`/`csrf_token` cookies stay first-party no matter which sites FE/BE end up on (two flat DuckDNS names count as different sites for `SameSite=Strict`). `API_INTERNAL_URL` is already set correctly per environment in `docker/docker-compose.prod.yml` / `docker-compose.staging.yml` — nothing to change during activation.
@@ -18,7 +22,13 @@ Scope note: this FE has no database, no migrations, and no persisted runtime sec
 5. Have SSH access to the VM with Docker + Docker Compose v2 installed (already true if `controller-api` is running there).
 6. **GitHub Actions secrets/variables** (repo Settings → Secrets and variables → Actions):
    - Secrets: `VPS_SSH_KEY`, `VPS_HOST`, `VPS_USER` (same values as `controller-api`'s), optional `VPS_PORT`.
-   - Variables: `FE_PROD_URL`, `FE_STAGING_URL` (the domains from step 2, used by the deploy job's smoke test), plus the production launch config from issue FE-05 (`NEXT_PUBLIC_TURNSTILE_SITE_KEY` real sitekey, `NEXT_PUBLIC_POSTHOG_KEY`/`_HOST`) if not already set — until these exist, production builds silently fall back to Cloudflare's always-pass test key.
+   - Variables: `FE_PROD_URL`, `FE_STAGING_URL` (the domains from step 2, used by the deploy job's smoke test), plus the production launch config (`NEXT_PUBLIC_TURNSTILE_SITE_KEY` real sitekey, `NEXT_PUBLIC_POSTHOG_KEY`/`_HOST`). Without the real sitekey, production builds silently fall back to Cloudflare's always-pass test key. ✅ All set as of 2026-08-02.
+
+   ⚠️ **Changing any `NEXT_PUBLIC_*` value requires a full rebuild + redeploy** — they are Docker build-args baked into the JS bundle at `next build` time on the CI runner, never read from a `.env` file on the VM (the FE containers have no `env_file:` at all, unlike `controller-api`'s). Restarting the container does nothing. Either push a commit, or re-run an existing workflow run from the Actions UI / `gh run rerun <id>`. To verify a value actually shipped, grep the served bundle rather than trusting that the variable is set:
+   ```sh
+   curl -s https://your-personas-app.duckdns.org/ | grep -oE '/_next/static/chunks/[^"]+\.js' | sort -u \
+     | while read -r f; do curl -s "https://your-personas-app.duckdns.org$f" | grep -o "<expected-value>"; done
+   ```
 
 ## 1. First-time deploy
 
@@ -59,7 +69,9 @@ Then manually, from a browser: full Guest flow (onboarding → assessment → su
 
 ## 2. Redeploy (routine updates)
 
-**Automated** — `.github/workflows/ci.yml`'s `deploy` (production, gated by the `production` environment's required-reviewer approval) and `deploy-staging` (auto) jobs run this exact sequence over SSH on every qualifying push, once the secrets in Prerequisites #6 are set. Until then, both are safe no-ops (skipped, not failed) — CI stays green while the VM is still being provisioned.
+**Automated** — `.github/workflows/ci.yml`'s `deploy` (production, gated by the `production` environment's required-reviewer approval) and `deploy-staging` (auto) jobs run this exact sequence over SSH on every qualifying push. Both are active. (If the secrets are ever missing, the jobs skip rather than fail, so CI stays green — that was the pre-activation behaviour.)
+
+> **Known flake:** the `docker compose pull` step occasionally fails with `Error response from daemon: lease does not exist: not found`. This is a transient containerd state issue on the VM, not a broken image — it has been hit twice and both times a plain retry (re-run the job, or `docker pull <image>` manually on the VM then re-run) succeeded immediately.
 
 **Manual** (fallback, or for a release you want to babysit):
 
