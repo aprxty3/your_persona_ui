@@ -27,7 +27,14 @@ function target(): string {
 function forwardHeaders(src: Headers): Headers {
   const out = new Headers();
   src.forEach((value, key) => {
-    if (!HOP_BY_HOP.has(key.toLowerCase())) out.set(key, value);
+    const name = key.toLowerCase();
+    // Drop the client's accept-encoding so the backend answers uncompressed.
+    // This hop is container-to-container, so compression buys nothing, and it
+    // removes any chance of handing the browser a body whose content-encoding
+    // no longer matches what fetch already decoded. Caddy still compresses the
+    // browser-facing hop.
+    if (name === 'accept-encoding') return;
+    if (!HOP_BY_HOP.has(name)) out.set(key, value);
   });
   return out;
 }
@@ -48,8 +55,22 @@ async function proxy(req: NextRequest, path: string[]): Promise<Response> {
 
     const headers = new Headers();
     upstream.headers.forEach((value, key) => {
-      if (!HOP_BY_HOP.has(key.toLowerCase())) headers.set(key, value);
+      const name = key.toLowerCase();
+      // set-cookie is copied separately below. content-length describes the
+      // upstream body and is re-derived while streaming.
+      if (name === 'set-cookie' || name === 'content-length') return;
+      if (!HOP_BY_HOP.has(name)) headers.set(key, value);
     });
+
+    // One response may legitimately carry several Set-Cookie headers, and
+    // Headers.set() OVERWRITES — building them in the loop above silently kept
+    // only the last cookie and threw the rest away. Today the backend never
+    // sends two at once (session_id is set only by /v1/guest-session, where the
+    // CSRF middleware is skipped), so this was latent; it would have started
+    // eating session_id the moment a second cookie was introduced.
+    for (const cookie of upstream.headers.getSetCookie()) {
+      headers.append('set-cookie', cookie);
+    }
 
     return new NextResponse(upstream.body, { status: upstream.status, headers });
   } catch (err) {
