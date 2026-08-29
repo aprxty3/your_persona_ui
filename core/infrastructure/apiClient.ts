@@ -182,6 +182,24 @@ async function requestWithMeta<S extends z.ZodTypeAny>(
       return requestWithMeta(schema, path, opts, true);
     }
 
+    // CSRF interceptor: prime the cookie → replay once.
+    // The BE only issues `csrf_token` on requests that actually enter its CSRF
+    // middleware — any GET, or a mutation on a protected path. Notably
+    // POST /v1/guest-session is skipped, so it does NOT prime. A screen whose
+    // first backend call is a protected mutation therefore has no cookie yet
+    // and is rejected through no fault of the user. One cheap GET fixes that.
+    if (
+      res.status === 403 &&
+      code === 'CSRF_TOKEN_INVALID' &&
+      !isRetry &&
+      method !== 'GET'
+    ) {
+      await fetch(`${BASE_URL}/healthz`, { credentials: 'include' }).catch(
+        () => undefined,
+      );
+      return requestWithMeta(schema, path, opts, true);
+    }
+
     throw new ApiError(code, message, res.status, meta, requestId);
   }
 
