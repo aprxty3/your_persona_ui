@@ -6,10 +6,9 @@ const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 const nextConfig = {
   output: 'standalone',
   reactStrictMode: true,
-  async rewrites() {
-    const target = process.env.API_INTERNAL_URL ?? 'http://localhost:8080';
-    return [{ source: '/api/be/:path*', destination: `${target}/:path*` }];
-  },
+  // NOTE: /api/be/* is proxied by app/api/be/[...path]/route.ts, NOT by rewrites().
+  // With output:'standalone', rewrites() is evaluated at BUILD time and baked into
+  // routes-manifest.json, so API_INTERNAL_URL set at container runtime was ignored.
 };
 
 export default withNextIntl(nextConfig);
